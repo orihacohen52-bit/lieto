@@ -1,0 +1,299 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {}
+    },
+    "trust": {
+      "type": "trust",
+      "blocks": {
+        "t1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "title": "מספר מעקב לכל הזמנה",
+            "text": "מעקב שקוף מרגע היציאה ועד הדלת"
+          }
+        },
+        "t2": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "title": "תשלום מאובטח 100%",
+            "text": "פרטי האשראי אינם נשמרים אצלנו"
+          }
+        },
+        "t3": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "title": "14 יום להחזרה",
+            "text": "לא ישב בול? מחזירים לפי התקנון"
+          }
+        },
+        "t4": {
+          "type": "item",
+          "settings": {
+            "icon": "chat",
+            "title": "שירות אישי בעברית",
+            "text": "זמינים בימים א׳–ה׳ לכל שאלה"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4"
+      ],
+      "settings": {}
+    },
+    "categories": {
+      "type": "categories",
+      "blocks": {
+        "c1": {
+          "type": "category",
+          "settings": {
+            "title": "טבעות",
+            "icon": "ring"
+          }
+        },
+        "c2": {
+          "type": "category",
+          "settings": {
+            "title": "שרשראות ותליונים",
+            "icon": "pendant"
+          }
+        },
+        "c3": {
+          "type": "category",
+          "settings": {
+            "title": "צמידים",
+            "icon": "bracelet"
+          }
+        },
+        "c4": {
+          "type": "category",
+          "settings": {
+            "title": "עגילים",
+            "icon": "hoop"
+          }
+        },
+        "c5": {
+          "type": "category",
+          "settings": {
+            "title": "סטים",
+            "icon": "set"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5"
+      ],
+      "settings": {}
+    },
+    "collection": {
+      "type": "featured-collection",
+      "settings": {}
+    },
+    "offers": {
+      "type": "offers",
+      "blocks": {
+        "o1": {
+          "type": "offer",
+          "settings": {
+            "title": "10% על ההזמנה הראשונה",
+            "text": "פעם ראשונה ב-LIETO? מזינים את הקוד בתשלום.",
+            "code": "LIETO10"
+          }
+        },
+        "o2": {
+          "type": "offer",
+          "settings": {
+            "title": "2 פריטים = 15% הנחה",
+            "text": "שרשרת וצמיד, או שתי שרשראות לשכבות. מוסיפים שניים לעגלה ומזינים את הקוד.",
+            "code": "PAIR15"
+          }
+        },
+        "o3": {
+          "type": "offer",
+          "settings": {
+            "title": "מבצע השקה לגברים",
+            "text": "15% הנחה על כל קולקציית הגברים.",
+            "code": "LAUNCH15",
+            "until": "2026-12-31"
+          }
+        }
+      },
+      "block_order": [
+        "o1",
+        "o2",
+        "o3"
+      ],
+      "settings": {}
+    },
+    "how": {
+      "type": "how",
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "בוחרים את הפריט",
+            "text": "מזמינים באתר תוך דקה ומקבלים אישור למייל."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "מטפלים בהזמנה",
+            "text": "ההזמנה יוצאת לטיפול ואריזה תוך יום עסקים."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "החבילה בדרך אליך",
+            "text": "מספר מעקב נשלח למייל ברגע שהיא יוצאת."
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "title": "לא יושב בול? מחזירים",
+            "text": "14 יום להחזרה, לפי התקנון."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {}
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {}
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "qa",
+          "settings": {
+            "q": "כמה זמן לוקח המשלוח?",
+            "a": "<p>זמן האספקה הוא בדרך כלל 10 עד 25 ימי עסקים. ברגע שהחבילה יוצאת לדרך נשלח אליך מספר מעקב למייל.</p>"
+          }
+        },
+        "q2": {
+          "type": "qa",
+          "settings": {
+            "q": "איך מבטלים או מחזירים?",
+            "a": "<p>אפשר לבטל או להחזיר עד 14 ימים מקבלת המוצר, כמפורט במדיניות ההחזרות. פנה אלינו ונחזור אליך במהירות.</p>"
+          }
+        },
+        "q3": {
+          "type": "qa",
+          "settings": {
+            "q": "האם התשלום מאובטח?",
+            "a": "<p>כן. התשלום מתבצע בעמוד סליקה מאובטח ומוצפן, ופרטי האשראי לא נשמרים אצלנו.</p>"
+          }
+        },
+        "q4": {
+          "type": "qa",
+          "settings": {
+            "q": "ממה עשויים התכשיטים? האם זה זהב או כסף אמיתי?",
+            "a": "<p>שקיפות מלאה: התכשיטים של LIETO הם תכשיטי אופנה לגברים — לא זהב אמיתי ולא כסף סטרלינג. אנחנו בוחרים פריטים מסגסוגות איכותיות ופלדת אל-חלד בגימור מטאלי (גוון כסוף, זהוב או שחור) כדי לתת לוק חד ונוכחות יוקרתית במחיר נגיש ליומיום. הרכב החומר המדויק מופיע בדף של כל מוצר.</p>"
+          }
+        },
+        "q5": {
+          "type": "qa",
+          "settings": {
+            "q": "יש מכס או עלויות נוספות?",
+            "a": "<p>בהזמנות תכשיטים בסכומים רגילים בדרך כלל אין תשלום נוסף. אם חל חיוב כלשהו, הוא נקבע על ידי רשות המיסים לפי החוק.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5"
+      ],
+      "settings": {}
+    },
+    "lookbook": {
+      "type": "lookbook",
+      "blocks": {
+        "l1": {
+          "type": "look",
+          "settings": {
+            "builtin": "lb-1.jpg",
+            "caption": "לבן ונקי"
+          }
+        },
+        "l2": {
+          "type": "look",
+          "settings": {
+            "builtin": "lb-2.jpg",
+            "caption": "קז׳ואל שחור"
+          }
+        },
+        "l3": {
+          "type": "look",
+          "settings": {
+            "builtin": "lb-3.jpg",
+            "caption": "ערב אורבני"
+          }
+        },
+        "l4": {
+          "type": "look",
+          "settings": {
+            "builtin": "lb-4.jpg",
+            "caption": "ים-תיכוני"
+          }
+        },
+        "l5": {
+          "type": "look",
+          "settings": {
+            "builtin": "lb-5.jpg",
+            "caption": "גוונים חמים"
+          }
+        },
+        "l6": {
+          "type": "look",
+          "settings": {
+            "builtin": "lb-6.jpg",
+            "caption": "שקיעה בחוף"
+          }
+        }
+      },
+      "block_order": [
+        "l1",
+        "l2",
+        "l3",
+        "l4",
+        "l5",
+        "l6"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "trust",
+    "categories",
+    "lookbook",
+    "collection",
+    "offers",
+    "how",
+    "newsletter",
+    "faq"
+  ]
+}

@@ -1,0 +1,467 @@
+[
+  {
+    "title": "צמיד חוליות קובני Titan",
+    "cat": "bracelets",
+    "art": "bracelet",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף מלוטש (תכשיט אופנה)",
+    "desc": "צמיד חוליות קובני ברוחב 6 מ״מ עם סוגר חזק. משתלב מצוין לצד שעון או לבד.",
+    "sizes": [
+      "19 ס״מ",
+      "21 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "שחור מט"
+    ],
+    "price": 85,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/1a8de7e709b29cd46a3ecfd9c4fb7bff",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/1a8de7e709b29cd46a3ecfd9c4fb7bff"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/38b093ddd0b2272d39cdda7095e9fbe8"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "br-titan"
+  },
+  {
+    "title": "עגילי חישוק Edge",
+    "cat": "earrings",
+    "art": "hoop",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף מוברש (תכשיט אופנה)",
+    "desc": "חישוקים קטנים ועבים בסגירת קליק נוחה. נקיים, קלים ויציבים כל היום.",
+    "sizes": [
+      "קוטר 12 מ״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "שחור מט"
+    ],
+    "price": 69,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 1,
+    "active": true,
+    "img": "/_blob/95a8f2b4270f08e8f8f822a613049158",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/95a8f2b4270f08e8f8f822a613049158"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "er-edge"
+  },
+  {
+    "title": "שרשרת תליון בר שחור מט Noir",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד בגימור שחור מט (תכשיט אופנה)",
+    "desc": "תליון מלבני אנכי בגימור שחור מט על שרשרת דקה בגוון גרפיט. מראה אורבני חד.",
+    "sizes": [
+      "55 ס״מ",
+      "60 ס״מ"
+    ],
+    "finishes": [
+      "שחור מט",
+      "גוון כסוף"
+    ],
+    "price": 89,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/159bb71298ea05bac937e9cee32a70ec",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/159bb71298ea05bac937e9cee32a70ec"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/7aa449911b3e4749ddb84611dc2361ad"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-bar"
+  },
+  {
+    "title": "שרשרת בוקס מרובעת Marco",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף (תכשיט אופנה)",
+    "desc": "חוליות קובייה גאומטריות ברוחב 3 מ״מ. נקייה ומדויקת, ומעולה גם כבסיס לשכבות.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ",
+      "60 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "שחור מט"
+    ],
+    "price": 79,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 1,
+    "active": true,
+    "img": "/_blob/cc0789fde4ce92629722ce3a3e81ce5c",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/cc0789fde4ce92629722ce3a3e81ce5c"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-box"
+  },
+  {
+    "title": "שרשרת תליון מצפן Atlas",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד בגימור כסוף מושחר (תכשיט אופנה)",
+    "desc": "תליון מצפן חרוט במראה וינטג׳ על שרשרת פלדה דקה. פרט קטן שנותן אופי לכל לוק.",
+    "sizes": [
+      "55 ס״מ",
+      "60 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף"
+    ],
+    "price": 95,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/97e6139f981e0f13eaa6570b702b6ac2",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/97e6139f981e0f13eaa6570b702b6ac2"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/5d05fec3b9e9d4ea71600ceb3a976ff9"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-compass"
+  },
+  {
+    "title": "שרשרת קובנית 5 מ״מ Havana",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור מטאלי (תכשיט אופנה)",
+    "desc": "חוליות קובניות מלוטשות ברוחב 5 מ״מ עם משקל מאוזן ונוכחות נקייה מעל טי-שירט או חולצה פתוחה.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ",
+      "60 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "גוון זהוב",
+      "שחור מט"
+    ],
+    "price": 99,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 3,
+    "active": true,
+    "img": "/_blob/bb851c352f35b28219fb1b4d2b9e41f0",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/bb851c352f35b28219fb1b4d2b9e41f0"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/7e42fa5f9e4fd4d88169801ba8017753"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-cuban"
+  },
+  {
+    "title": "שרשרת פיגארו Milano",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף (תכשיט אופנה)",
+    "desc": "קצב חוליות איטלקי קלאסי: חוליה מאורכת ושלוש קצרות. יושבת קליל על הצוואר לשימוש יומיומי.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ",
+      "60 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "גוון זהוב"
+    ],
+    "price": 89,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/5974642217eddc1331631721d15aa446",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/5974642217eddc1331631721d15aa446"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/6a325355c50a5f44eae633f49339ba32"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-figaro"
+  },
+  {
+    "title": "שרשרת חוליות מוארכות Vienna",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף (תכשיט אופנה)",
+    "desc": "חוליות אובליות מוארכות במראה מודרני וקליל, שמתאים גם ליציאה וגם ליום-יום.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "גוון זהוב"
+    ],
+    "price": 92,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 1,
+    "active": true,
+    "img": "/_blob/da87d68caee23dceb77fa52ffca894ba",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/da87d68caee23dceb77fa52ffca894ba"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-paperclip"
+  },
+  {
+    "title": "שרשרת חבל שזורה Cannes",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף (תכשיט אופנה)",
+    "desc": "שזירת חבל ברוחב 4 מ״מ שתופסת את האור מכל זווית ונשארת חלקה ונוחה על העור.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ",
+      "60 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף",
+      "גוון זהוב"
+    ],
+    "price": 94,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 3,
+    "active": true,
+    "img": "/_blob/38b093ddd0b2272d39cdda7095e9fbe8",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/38b093ddd0b2272d39cdda7095e9fbe8"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/220122696ec6831cdcebd6cdf460aa22"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-rope"
+  },
+  {
+    "title": "שרשרת סנייק שטוחה Roma",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור זהוב מוברש (תכשיט אופנה)",
+    "desc": "שרשרת נחש שטוחה ברוחב 4 מ״מ בגוון זהוב מעודן, שיושבת שטוח על קו עצם הבריח.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ"
+    ],
+    "finishes": [
+      "גוון זהוב",
+      "גוון כסוף"
+    ],
+    "price": 99,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/bbea293de7e76cb4c5c48b4c7d907021",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/bbea293de7e76cb4c5c48b4c7d907021"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/ee835276eddf9eeb3919478f64621e22"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-snake"
+  },
+  {
+    "title": "סט שכבות Duo: קובנית + תליון",
+    "cat": "sets",
+    "art": "set",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף (תכשיטי אופנה)",
+    "desc": "שילוב שכבות מוכן: שרשרת קובנית 50 ס״מ ושרשרת תליון בר 55 ס״מ.",
+    "sizes": [
+      "סט 50 + 55 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף"
+    ],
+    "price": 169,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/b3a548dd485ce0592200df5291947931",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/b3a548dd485ce0592200df5291947931"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-stack"
+  },
+  {
+    "title": "שרשרת תליון אבן שחורה Onyx",
+    "cat": "necklaces",
+    "art": "chain",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L ואבן שחורה דקורטיבית (תכשיט אופנה)",
+    "desc": "תליון מלבני כהה במסגרת מתכתית נקייה על שרשרת כסופה. אלגנטי בלי להתאמץ.",
+    "sizes": [
+      "50 ס״מ",
+      "55 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף"
+    ],
+    "price": 95,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 1,
+    "active": true,
+    "img": "/_blob/8415aa511e61e79650140f2fdf85895f",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/8415aa511e61e79650140f2fdf85895f"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "nk-stone"
+  },
+  {
+    "title": "סט טבעות חותם ופס Iron",
+    "cat": "rings",
+    "art": "band",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף מוברש ושחור מט",
+    "desc": "טבעת חותם מרובעת מוברשת לצד טבעת פסים שחורה מט. זוג משלים לענידה יחד או בנפרד.",
+    "sizes": [
+      "מידה 8",
+      "מידה 9",
+      "מידה 10",
+      "מידה 11"
+    ],
+    "finishes": [
+      "כסוף + שחור מט"
+    ],
+    "price": 89,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/3e21aa26d7baac3f093e25aeb4c7bbd2",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/3e21aa26d7baac3f093e25aeb4c7bbd2"
+      },
+      {
+        "t": "img",
+        "src": "/_blob/38b093ddd0b2272d39cdda7095e9fbe8"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "rg-iron"
+  },
+  {
+    "title": "סט פיגארו: שרשרת וצמיד",
+    "cat": "sets",
+    "art": "set",
+    "metal": "silver",
+    "mat": "פלדת אל-חלד 316L בגימור כסוף (תכשיטי אופנה)",
+    "desc": "שרשרת פיגארו 55 ס״מ וצמיד פיגארו תואם 20 ס״מ בחבילה אחת.",
+    "sizes": [
+      "55 ס״מ + צמיד 20 ס״מ"
+    ],
+    "finishes": [
+      "גוון כסוף"
+    ],
+    "price": 159,
+    "was": 0,
+    "cost": 0,
+    "tag": "חדש",
+    "feat": 2,
+    "active": true,
+    "img": "/_blob/296167ed0f50dd81b140fa549662be8a",
+    "media": [
+      {
+        "t": "img",
+        "src": "/_blob/296167ed0f50dd81b140fa549662be8a"
+      }
+    ],
+    "supplierTitle": "ספק אישי",
+    "id": "st-figaro"
+  }
+]

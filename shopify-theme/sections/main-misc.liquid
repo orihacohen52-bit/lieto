@@ -1,0 +1,40 @@
+{%- case request.page_type -%}
+{%- when 'search' -%}
+  <section class="blk" style="padding-top:110px"><div class="wrap">
+    <h1 style="font-size:2.2rem;margin-bottom:18px">{{ 'search.title' | t }}</h1>
+    <form action="{{ routes.search_url }}" method="get" role="search" style="display:flex;gap:10px;margin-bottom:28px">
+      <input type="hidden" name="type" value="product">
+      <label class="sr" for="q">{{ 'search.title' | t }}</label>
+      <input class="field" id="q" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'search.placeholder' | t }}" style="flex:1">
+      <button class="btn btn-ink" type="submit">{{ 'search.go' | t }}</button>
+    </form>
+    {%- if search.performed -%}
+      <div class="grid">
+        {%- for item in search.results -%}
+          {%- if item.object_type == 'product' -%}{% render 'product-card', product: item %}{%- endif -%}
+        {%- else -%}
+          <div class="empty" style="grid-column:1/-1">{{ 'search.none' | t }}</div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div></section>
+{%- when 'list-collections' -%}
+  <section class="blk" style="padding-top:110px"><div class="wrap">
+    <h1 style="font-size:2.2rem;margin-bottom:24px">{{ 'collections.all' | t }}</h1>
+    <div class="cats" style="--cols:4">
+      {%- for c in collections -%}
+        <a class="cat" href="{{ c.url }}"><span class="ico">{%- if c.featured_image -%}{{ c.featured_image | image_url: width: 400 | image_tag: alt: '', loading: 'lazy' }}{%- endif -%}</span><b>{{ c.title | escape }}</b></a>
+      {%- endfor -%}
+    </div>
+  </div></section>
+{%- else -%}
+  <section class="blk" style="padding-top:140px;text-align:center"><div class="wrap">
+    <h1 style="font-size:2.4rem">{{ 'general.not_found' | t }}</h1>
+    <p style="color:var(--muted)">{{ 'general.not_found_text' | t }}</p>
+    <a class="btn btn-ink" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue' | t }}</a>
+  </div></section>
+{%- endcase -%}
+
+{% schema %}
+{ "name": "עמוד כללי", "settings": [] }
+{% endschema %}

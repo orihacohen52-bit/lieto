@@ -1,0 +1,52 @@
+<section class="blk" id="offers" style="padding-top:20px" {{ section.shopify_attributes }}>
+  <div class="wrap">
+    <div class="sec-h"><div>
+      {%- if section.settings.eyebrow != blank -%}<div class="eyebrow">{{ section.settings.eyebrow | escape }}</div>{%- endif -%}
+      <h2>{{ section.settings.heading | escape }}</h2>
+    </div></div>
+    <div class="promo-grid">
+      {%- for block in section.blocks -%}
+        <div class="promo" {{ block.shopify_attributes }}{% if block.settings.until != blank %} data-promo-card{% endif %}>
+          <h3>{{ block.settings.title | escape }}</h3>
+          {%- if block.settings.text != blank -%}<p>{{ block.settings.text | escape }}</p>{%- endif -%}
+          {%- if block.settings.code != blank -%}<span class="code">{{ block.settings.code | escape }}</span>{%- endif -%}
+          {%- if block.settings.until != blank -%}
+            <div class="count" data-count="{{ block.settings.until | escape }}" data-d="{{ 'promo.days' | t }}" data-h="{{ 'promo.hours' | t }}" data-m="{{ 'promo.minutes' | t }}" data-s="{{ 'promo.seconds' | t }}" aria-hidden="true"></div>
+            <small style="color:var(--muted)">{{ 'promo.ends' | t: date: block.settings.until }}</small>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "הטבות",
+  "max_blocks": 3,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "כותרת קטנה", "default": "הטבות" },
+    { "type": "text", "id": "heading", "label": "כותרת", "default": "ככה משדרגים את הלוק בפחות" }
+  ],
+  "blocks": [
+    {
+      "type": "offer",
+      "name": "הטבה",
+      "settings": [
+        { "type": "text", "id": "title", "label": "כותרת", "default": "10% על ההזמנה הראשונה" },
+        { "type": "text", "id": "text", "label": "טקסט" },
+        { "type": "text", "id": "code", "label": "קוד" },
+        { "type": "text", "id": "until", "label": "תאריך סיום לספירה לאחור (YYYY-MM-DD, לא חובה)", "info": "אחרי התאריך ההטבה נעלמת מהעמוד" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "הטבות",
+    "blocks": [
+      { "type": "offer", "settings": { "title": "10% על ההזמנה הראשונה", "text": "פעם ראשונה ב-LIETO? מזינים את הקוד בתשלום.", "code": "LIETO10" } },
+      { "type": "offer", "settings": { "title": "2 פריטים = 15% הנחה", "text": "שרשרת וצמיד, או שתי שרשראות לשכבות. מוסיפים שניים לעגלה ומזינים את הקוד.", "code": "PAIR15" } },
+      { "type": "offer", "settings": { "title": "מבצע השקה לגברים", "text": "15% הנחה על כל קולקציית הגברים.", "code": "LAUNCH15", "until": "2026-12-31" } }
+    ]
+  }]
+}
+{% endschema %}

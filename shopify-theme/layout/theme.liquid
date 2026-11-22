@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="{{ canonical_url }}">
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64, height: 64 }}">
+  {%- endif -%}
+  <title>{{ page_title }}{% unless page_title contains shop.name %} · {{ shop.name }}{% endunless %}</title>
+  {%- if page_description -%}<meta name="description" content="{{ page_description | escape }}">{%- endif -%}
+  {% render 'social-meta' %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400;500;600;700&display=swap">
+  {{ 'lieto.css' | asset_url | stylesheet_tag }}
+  <style>
+    :root{
+      --gold: {{ settings.color_accent }};
+      --ink: {{ settings.color_ink }};
+    }
+  </style>
+  {{ content_for_header }}
+</head>
+<body>
+  <a class="skip" href="#main">{{ 'general.skip' | t }}</a>
+  {% section 'header' %}
+  <main id="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+  {% section 'footer' %}
+  {% render 'a11y-widget' %}
+  {% render 'cookie-banner' %}
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    window.LIETO = {
+      cartUrl: {{ routes.cart_url | json }},
+      cartAddUrl: {{ routes.cart_add_url | json }},
+      cartChangeUrl: {{ routes.cart_change_url | json }},
+      added: {{ 'cart.added' | t | json }},
+      freeShipFrom: {{ settings.free_ship_from | times: 100 | json }}
+    };
+  </script>
+  <script src="{{ 'lieto.js' | asset_url }}" defer></script>
+</body>
+</html>

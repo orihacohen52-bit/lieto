@@ -1,0 +1,5 @@
+<div class="wrap page" style="padding-top:110px">
+  <h1>{{ 'customer.addresses' | t }}</h1>
+  {%- for address in customer.addresses -%}<p>{{ address | format_address }}</p>{%- endfor -%}
+  <p><a href="{{ routes.account_url }}">{{ 'customer.account' | t }}</a></p>
+</div>

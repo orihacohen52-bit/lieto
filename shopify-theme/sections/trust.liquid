@@ -1,0 +1,33 @@
+<div class="trust" {{ section.shopify_attributes }}>
+  {%- for block in section.blocks -%}
+    <div {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}<p style="margin:0"><b>{{ block.settings.title | escape }}</b><span>{{ block.settings.text | escape }}</span></p></div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "פס אמון",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "item",
+      "name": "פריט",
+      "settings": [
+        { "type": "select", "id": "icon", "label": "אייקון", "default": "truck", "options": [
+          { "value": "truck", "label": "משלוח" }, { "value": "shield", "label": "אבטחה" }, { "value": "return", "label": "החזרה" }, { "value": "chat", "label": "שירות" } ] },
+        { "type": "text", "id": "title", "label": "כותרת", "default": "מספר מעקב לכל הזמנה" },
+        { "type": "text", "id": "text", "label": "טקסט", "default": "יודעים בדיוק איפה החבילה" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "פס אמון",
+    "blocks": [
+      { "type": "item", "settings": { "icon": "truck", "title": "מספר מעקב לכל הזמנה", "text": "מעקב שקוף מרגע היציאה ועד הדלת" } },
+      { "type": "item", "settings": { "icon": "shield", "title": "תשלום מאובטח 100%", "text": "פרטי האשראי אינם נשמרים אצלנו" } },
+      { "type": "item", "settings": { "icon": "return", "title": "14 יום להחזרה", "text": "לא ישב בול? מחזירים לפי התקנון" } },
+      { "type": "item", "settings": { "icon": "chat", "title": "שירות אישי בעברית", "text": "זמינים בימים א׳–ה׳ לכל שאלה" } }
+    ]
+  }]
+}
+{% endschema %}

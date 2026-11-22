@@ -1,0 +1,12 @@
+<div class="wrap page" style="padding-top:110px">
+  <h1>{{ 'customer.account' | t }}</h1>
+  <p>{{ customer.name | escape }} · <a href="{{ routes.account_logout_url }}">{{ 'customer.logout' | t }}</a></p>
+  <h2 style="margin-top:24px">{{ 'customer.orders' | t }}</h2>
+  {%- if customer.orders.size > 0 -%}
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:480px">
+      {%- for order in customer.orders -%}
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:10px"><a href="{{ order.customer_url }}">{{ order.name }}</a></td><td>{{ order.created_at | date: '%d.%m.%Y' }}</td><td>{{ order.fulfillment_status_label }}</td><td>{{ order.total_price | money }}</td></tr>
+      {%- endfor -%}
+    </table></div>
+  {%- else -%}<p>{{ 'customer.no_orders' | t }}</p>{%- endif -%}
+</div>

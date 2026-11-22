@@ -1,0 +1,56 @@
+<section class="blk" id="categories" {{ section.shopify_attributes }}>
+  <div class="wrap">
+    <div class="sec-h"><div>
+      {%- if section.settings.eyebrow != blank -%}<div class="eyebrow">{{ section.settings.eyebrow | escape }}</div>{%- endif -%}
+      <h2>{{ section.settings.heading | escape }}</h2>
+    </div></div>
+    <div class="cats" style="--cols:{{ section.blocks.size | at_least: 1 | at_most: 5 }}">
+      {%- for block in section.blocks -%}
+        {%- assign c = block.settings.collection -%}
+        <a class="cat" href="{{ c.url | default: routes.all_products_collection_url }}" {{ block.shopify_attributes }}>
+          <span class="ico">
+            {%- if block.settings.image != blank -%}{{ block.settings.image | image_url: width: 400 | image_tag: alt: '', loading: 'lazy' }}{%- else -%}{% render 'icon', name: block.settings.icon %}{%- endif -%}
+          </span>
+          <b>{{ block.settings.title | default: c.title | escape }}</b>
+          {%- if c != blank -%}
+            <small>{%- if c.products_count == 1 -%}{{ 'collections.one_item' | t }}{%- else -%}{{ 'collections.items' | t: count: c.products_count }}{%- endif -%}</small>
+          {%- endif -%}
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "קטגוריות",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "כותרת קטנה", "default": "קטגוריות לגברים" },
+    { "type": "text", "id": "heading", "label": "כותרת", "default": "בחר את הסטייל שלך" }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "קטגוריה",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "אוסף" },
+        { "type": "text", "id": "title", "label": "שם (אם ריק, שם האוסף)" },
+        { "type": "select", "id": "icon", "label": "איור", "default": "ring", "options": [
+          { "value": "ring", "label": "טבעת" }, { "value": "pendant", "label": "שרשרת ותליון" }, { "value": "bracelet", "label": "צמיד" }, { "value": "hoop", "label": "עגילים" }, { "value": "set", "label": "סט" } ] },
+        { "type": "image_picker", "id": "image", "label": "תמונה במקום איור (לא חובה)" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "קטגוריות",
+    "blocks": [
+      { "type": "category", "settings": { "title": "טבעות", "icon": "ring" } },
+      { "type": "category", "settings": { "title": "שרשראות ותליונים", "icon": "pendant" } },
+      { "type": "category", "settings": { "title": "צמידים", "icon": "bracelet" } },
+      { "type": "category", "settings": { "title": "עגילים", "icon": "hoop" } },
+      { "type": "category", "settings": { "title": "סטים", "icon": "set" } }
+    ]
+  }]
+}
+{% endschema %}

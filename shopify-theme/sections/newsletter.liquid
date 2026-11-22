@@ -1,0 +1,39 @@
+<section class="blk" {{ section.shopify_attributes }}>
+  <div class="wrap">
+    <div class="news">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<div class="eyebrow">{{ section.settings.eyebrow | escape }}</div>{%- endif -%}
+        <h2 style="margin-block:8px 10px;font-size:2rem">{{ section.settings.heading | escape }}</h2>
+        <p style="margin:0;color:var(--muted)">{{ section.settings.text | escape }}</p>
+      </div>
+      <div>
+        {%- form 'customer', id: 'newsletter-form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          {%- if form.posted_successfully? -%}
+            <p class="okmsg" role="status">{{ section.settings.success | escape }}</p>
+          {%- else -%}
+            {%- if form.errors -%}<p class="errmsg" role="alert">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>{%- endif -%}
+            <label class="sr" for="nl-email">{{ 'newsletter.email' | t }}</label>
+            <input class="field" id="nl-email" type="email" name="contact[email]" placeholder="{{ 'newsletter.email' | t }}" autocomplete="email" required>
+            <button class="btn btn-ink" type="submit">{{ section.settings.button | escape }}</button>
+            <label class="chk"><input type="checkbox" name="contact[accepts_marketing]" value="true" required><span>{{ 'newsletter.consent' | t }}</span></label>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "ניוזלטר",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "כותרת קטנה", "default": "מועדון LIETO" },
+    { "type": "text", "id": "heading", "label": "כותרת", "default": "10% על ההזמנה הראשונה" },
+    { "type": "textarea", "id": "text", "label": "טקסט", "default": "השאר מייל, קבל את קוד ההנחה, ותהיה הראשון לשמוע על דרופים חדשים ומבצעים לגברים. בלי ספאם, הסרה בקליק." },
+    { "type": "text", "id": "button", "label": "כפתור", "default": "שלחו לי 10%" },
+    { "type": "text", "id": "success", "label": "הודעת הצלחה", "default": "נרשמת! קוד ההנחה שלך: LIETO10" }
+  ],
+  "presets": [{ "name": "ניוזלטר" }]
+}
+{% endschema %}
