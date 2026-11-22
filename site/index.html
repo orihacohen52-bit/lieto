@@ -1059,17 +1059,24 @@ function renderAdmin(){
     os.forEach(o=>{const b=buckets.find(b=>o.t>=b.s&&o.t<b.e);if(b){b.rv+=netOf(o);b.pf+=netOf(o)-costOf(o)}});
     const mx=Math.max(1,...buckets.map(b=>b.rv));
     const tp={};os.forEach(o=>o.items.forEach(i=>{const x=tp[i.title]||(tp[i.title]={q:0,r:0});x.q+=i.q;x.r+=i.q*i.price}));
+    const paidOs=os.filter(o=>o.status!=='new'),retOs=paidOs.filter(o=>o.status==='refunded'||+o.refund>0);
+    const gross=paidOs.reduce((a,o)=>a+o.total,0),refAmt=retOs.reduce((a,o)=>a+(+o.refund||0),0);
+    const retPct=paidOs.length?retOs.length/paidOs.length*100:0,refPct=gross?refAmt/gross*100:0;
+    const rp={};paidOs.forEach(o=>{const r=retOs.includes(o);o.items.forEach(i=>{const x=rp[i.title]||(rp[i.title]={n:0,r:0});x.n+=i.q;if(r)x.r+=i.q})});
+    const retRows=Object.entries(rp).filter(([,x])=>x.r).sort((a,b)=>b[1].r/b[1].n-a[1].r/a[1].n);
     const top=Object.entries(tp).sort((a,b)=>b[1].r-a[1].r).slice(0,6),tmx=Math.max(1,...top.map(t=>t[1].r));
     B.innerHTML=notice+rangeCtl+`<div class="kpis">
      <div class="kpi"><span>הכנסות</span><b>${money(rev)}</b><small>${os.length} הזמנות</small></div>
      <div class="kpi"><span>עלות מוצרים (ספק)</span><b>${money(cost)}</b><small>לפי עלות שהוזנה</small></div>
      <div class="kpi"><span>רווח גולמי</span><b style="color:var(--ok)">${money(profit)}</b><small>${margin.toFixed(1)}% מרווחיות</small></div>
      <div class="kpi"><span>ממוצע להזמנה</span><b>${money(aov)}</b><small>הנחות ${money(disc)} · משלוחים ${money(ship)}</small></div>
-     <div class="kpi"><span>צפיות / הוספות לעגלה</span><b>${views} / ${carts}</b><small>${views?(os.length/views*100).toFixed(1):'0'}% המרה</small></div></div>
+     <div class="kpi"><span>צפיות / הוספות לעגלה</span><b>${views} / ${carts}</b><small>${views?(os.length/views*100).toFixed(1):'0'}% המרה</small></div>
+     <div class="kpi"><span>אחוז החזרות</span><b style="color:${retPct>=10?'var(--bad)':retPct>=5?'var(--warn)':'inherit'}">${retPct.toFixed(1)}%</b><small>${retOs.length} מתוך ${paidOs.length} הזמנות ששולמו · זוכו ${money(refAmt)} (${refPct.toFixed(1)}% מההכנסות)</small></div></div>
      <div class="two"><div class="panel"><h3>הכנסות ורווח לפי תאריך</h3><div class="legend"><span><i style="background:var(--gold)"></i>הכנסות</span><span><i style="background:var(--ok)"></i>רווח</span></div>
      <div class="bars" role="img" aria-label="גרף הכנסות ורווח">${buckets.map(b=>`<div class="bar" title="${dstr(b.s)}: ${money(b.rv)}"><i class="rv" style="height:${b.rv/mx*100}%"></i></div>`).join('')}</div><div class="axis"><span>${dstr(buckets[0].s)}</span><span>${dstr(buckets[buckets.length-1].s)}</span></div>
      <div class="bars" style="height:90px;margin-top:10px" aria-hidden="true">${buckets.map(b=>`<div class="bar"><i class="pf" style="height:${Math.max(0,b.pf)/mx*100}%"></i></div>`).join('')}</div></div>
      <div class="panel"><h3>מוצרים מובילים</h3>${top.length?top.map(([n,x])=>`<div class="hbar"><span>${esc(n)}</span><div><i style="width:${x.r/tmx*100}%"></i></div><b>${money(x.r)}</b></div>`).join(''):'<div class="empty">אין עדיין מכירות בטווח.</div>'}</div></div>
+     <div class="panel"><h3>החזרות לפי מוצר</h3>${retRows.length?retRows.map(([n,x])=>`<div class="hbar"><span>${esc(n)}</span><div><i style="width:${x.r/x.n*100}%;background:var(--bad)"></i></div><b>${(x.r/x.n*100).toFixed(0)}% · ${x.r}/${x.n}</b></div>`).join(''):'<div class="empty">אין החזרות בטווח שנבחר.</div>'}</div>
      <div class="panel"><h3>הזמנות אחרונות</h3>${ordersTable(ORDERS.slice().sort((a,b)=>b.t-a.t).slice(0,6),true)}</div>`;
   } else if(admTab==='orders'){
     const l=ORDERS.filter(o=>inRange(o)&&(admStatus==='all'||o.status===admStatus)&&(!admQ||(o.id+o.customer.name+o.customer.email+o.customer.phone).toLowerCase().includes(admQ.toLowerCase()))).sort((a,b)=>b.t-a.t);
