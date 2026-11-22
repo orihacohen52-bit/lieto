@@ -3,7 +3,7 @@
   --bg:#f6f7f8; --surface:#ffffff; --stone:#eceef0; --muted:#5b6170; --line:#e1e4ea;
   --gold-soft:#e9dcc0; --night:#f0f1f3; --on-night:#14171f;
   --ok:#1f7a4d; --warn:#b36b00; --bad:#b3261e;
-  --font-display:'Frank Ruhl Libre','David Libre',Georgia,serif;
+  --font-display:'Noto Serif Hebrew','David Libre',Georgia,serif;
   --font-body:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
   --radius:14px; --fs:1; color-scheme:light;
 }
@@ -11,7 +11,7 @@
 html{scroll-behavior:smooth;font-size:calc(16px * var(--fs))}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:1rem;line-height:1.6;direction:rtl}
 img{max-width:100%;height:auto}
-h1,h2,h3{font-family:var(--font-display);font-weight:500;line-height:1.2;margin:0;text-wrap:balance}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;line-height:1.22;letter-spacing:-.005em;margin:0;text-wrap:balance}
 a{color:inherit}
 button{font:inherit;cursor:pointer;color:inherit}
 input,select,textarea{font:inherit;color:inherit}
