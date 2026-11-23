@@ -1,0 +1,11 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ 'gift.title' | t }} · {{ shop.name }}</title>{{ 'lieto.css' | asset_url | stylesheet_tag }}{{ content_for_header }}</head>
+<body><div class="wrap page" style="text-align:center">
+  <h1>{{ shop.name }}</h1>
+  <p>{{ 'gift.title' | t }}: <b>{{ gift_card.balance | money }}</b></p>
+  <p dir="ltr" style="font-size:1.4rem;letter-spacing:.1em">{{ gift_card.code | format_code }}</p>
+  {%- if gift_card.expired -%}<p class="errmsg">{{ 'gift.expired' | t }}</p>{%- endif -%}
+  <a class="btn btn-ink" href="{{ shop.url }}">{{ 'cart.continue' | t }}</a>
+</div></body></html>

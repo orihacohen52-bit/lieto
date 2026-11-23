@@ -1,0 +1,4 @@
+<div class="cookie" id="cookie" role="dialog" aria-label="{{ 'cookie.label' | t }}">
+  <p>{{ 'cookie.text' | t }}{% if shop.privacy_policy %} <a href="{{ shop.privacy_policy.url }}">{{ shop.privacy_policy.title | escape }}</a>{% endif %}</p>
+  <button class="btn btn-ink btn-sm" id="cookieOk" type="button">{{ 'cookie.ok' | t }}</button>
+</div>

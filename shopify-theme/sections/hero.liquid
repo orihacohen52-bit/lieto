@@ -1,0 +1,112 @@
+{%- liquid
+  assign p = section.settings.product
+  assign pct = section.settings.promo_pct | default: 0
+  assign code = section.settings.promo_code | strip | upcase
+  assign has_promo = false
+  if p != blank and code != blank and pct > 0
+    assign has_promo = true
+    assign keep = 100 | minus: pct
+    assign after = p.price | times: keep | divided_by: 100
+    assign saved = p.price | minus: after
+    assign after_m = after | money
+    assign saved_m = saved | money
+  endif
+  assign img = section.settings.image
+  if img == blank and p != blank
+    assign img = p.featured_image
+  endif
+-%}
+<section class="hero" {{ section.shopify_attributes }}>
+  <div class="wrap hero-grid">
+    <div>
+      {%- if section.settings.kicker != blank -%}<p class="kicker">{{ section.settings.kicker }}</p>{%- endif -%}
+      <h1>{{ section.settings.heading_1 | escape }}{% if section.settings.heading_2 != blank %}<br>{{ section.settings.heading_2 | escape }}{% endif %}</h1>
+      {%- if section.settings.text != blank -%}<p class="lead">{{ section.settings.text | escape }}</p>{%- endif -%}
+      <div class="hero-cta">
+        {%- if section.settings.btn_label != blank -%}<a class="btn btn-ink" href="{{ section.settings.btn_link | default: routes.all_products_collection_url }}">{{ section.settings.btn_label | escape }}</a>{%- endif -%}
+        {%- if section.settings.link_label != blank -%}<a class="txtlink" href="{{ section.settings.link_url | default: '#how' }}">{{ section.settings.link_label | escape }}</a>{%- endif -%}
+      </div>
+      {%- assign pc = section.settings.picks -%}
+      {%- if pc != blank and pc.products_count > 0 -%}
+        <div class="picks">
+          <div class="picks-h"><span>{{ section.settings.picks_title | escape }}</span><a class="txtlink" href="{{ pc.url }}" style="font-size:.84rem">{{ 'general.all' | t }}</a></div>
+          <div class="picks-row">
+            {%- assign shown = 0 -%}
+            {%- for item in pc.products -%}
+              {%- if p != blank and item.id == p.id -%}{%- continue -%}{%- endif -%}
+              {%- if shown >= 3 -%}{%- break -%}{%- endif -%}
+              {%- assign shown = shown | plus: 1 -%}
+              <a class="pick" href="{{ item.url }}">
+                <span class="th">{%- if item.featured_image -%}{{ item.featured_image | image_url: width: 120 | image_tag: alt: '', loading: 'lazy' }}{%- endif -%}</span>
+                <span><span>{{ item.title | escape }}</span><b>{{ item.price | money }}</b></span>
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <figure class="hero-fig">
+      {%- if p != blank -%}
+        {%- capture buy_url -%}{% if has_promo %}/discount/{{ code | url_encode }}?redirect={{ p.url | url_encode }}{% else %}{{ p.url }}{% endif %}{%- endcapture -%}
+        <a class="stage" href="{{ buy_url }}" aria-label="{{ p.title | escape }}">
+          {%- if img != blank -%}{{ img | image_url: width: 1500 | image_tag: alt: p.title, loading: 'eager', fetchpriority: 'high', widths: '600, 900, 1200, 1500', sizes: '(max-width: 760px) 100vw, 50vw' }}{%- endif -%}
+          {%- if has_promo -%}<span class="hdeal" aria-hidden="true"><b>{{ pct }}%</b><small>{{ 'promo.off' | t }}</small></span>{%- endif -%}
+          {%- if section.settings.flag != blank -%}<span class="hflag">{{ section.settings.flag | escape }}</span>{%- endif -%}
+        </a>
+        <figcaption class="hcap">
+          <div class="hcap-t">
+            <span class="hcap-n">{{ p.title | escape }}</span>
+            <span class="hcap-p">
+              {%- if has_promo -%}
+                <b>{{ after | money }}</b><s>{{ p.price | money }}</s><em>{{ 'promo.save' | t: amount: saved_m }}</em>
+              {%- else -%}
+                <b>{{ p.price | money }}</b>{%- if p.compare_at_price > p.price -%}<s>{{ p.compare_at_price | money }}</s>{%- endif -%}
+              {%- endif -%}
+            </span>
+            {%- if has_promo -%}
+              <small class="hcap-terms">
+                {%- if section.settings.promo_until != blank -%}<b data-days-left="{{ section.settings.promo_until }}" data-tpl="{{ 'promo.days_left' | t }}" data-one="{{ 'promo.one_day' | t }}" data-many="{{ 'promo.days' | t }}" hidden></b> · {% endif -%}
+                {{ 'promo.auto_code' | t: code: code }} · {{ 'promo.whole_order' | t: pct: pct }}
+                {%- if section.settings.terms_page != blank %} · <a href="{{ section.settings.terms_page.url }}">{{ 'promo.terms' | t }}</a>{% endif -%}
+              </small>
+            {%- endif -%}
+          </div>
+          <a class="btn btn-ink btn-sm" href="{{ buy_url }}">{%- if has_promo -%}{{ 'promo.buy_now_at' | t: price: after_m }}{%- else -%}{{ 'promo.buy_now' | t }}{%- endif -%}</a>
+        </figcaption>
+      {%- else -%}
+        <div class="stage">{{ 'product-1' | placeholder_svg_tag }}</div>
+        <figcaption class="hcap"><span class="hcap-n">בחרו מוצר בהגדרות האזור הזה</span></figcaption>
+      {%- endif -%}
+    </figure>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "אזור פתיחה",
+  "settings": [
+    { "type": "inline_richtext", "id": "kicker", "label": "שורה מעל הכותרת", "default": "<b>LIETO</b> · תכשיטי אופנה לגברים" },
+    { "type": "text", "id": "heading_1", "label": "כותרת, שורה 1", "default": "לוק חד ויוקרתי." },
+    { "type": "text", "id": "heading_2", "label": "כותרת, שורה 2", "default": "בלי תג מחיר מנופח." },
+    { "type": "textarea", "id": "text", "label": "טקסט", "default": "שרשראות, צמידים וסטים לגברים בגימור מטאלי חד שסוגר כל הופעה — מטי-שירט לבנה ועד יציאה בערב. משלוח עם מספר מעקב ו-14 יום להחזרה." },
+    { "type": "text", "id": "btn_label", "label": "כפתור ראשי", "default": "לקולקציית הגברים" },
+    { "type": "url", "id": "btn_link", "label": "קישור כפתור ראשי" },
+    { "type": "text", "id": "link_label", "label": "קישור משני", "default": "איך ההזמנה עובדת" },
+    { "type": "url", "id": "link_url", "label": "כתובת קישור משני" },
+    { "type": "header", "content": "מוצר הדגל" },
+    { "type": "product", "id": "product", "label": "המוצר שמוצג" },
+    { "type": "image_picker", "id": "image", "label": "תמונה לאזור הפתיחה (רחבה, למשל רקע הזהב)", "info": "אם ריק, תוצג התמונה הראשית של המוצר" },
+    { "type": "text", "id": "flag", "label": "תגית על התמונה", "default": "מבצע השקה" },
+    { "type": "header", "content": "מבצע", "info": "את הקוד עצמו יוצרים ב-Shopify תחת Discounts, עם אותו אחוז ותאריך סיום" },
+    { "type": "text", "id": "promo_code", "label": "קוד הנחה", "default": "LAUNCH15" },
+    { "type": "range", "id": "promo_pct", "label": "אחוז הנחה", "min": 0, "max": 50, "step": 1, "unit": "%", "default": 15 },
+    { "type": "text", "id": "promo_until", "label": "תאריך סיום (YYYY-MM-DD)", "default": "2026-12-31" },
+    { "type": "page", "id": "terms_page", "label": "עמוד תנאי המבצע" },
+    { "type": "header", "content": "מוצרים מומלצים" },
+    { "type": "text", "id": "picks_title", "label": "כותרת", "default": "הבחירות שלנו" },
+    { "type": "collection", "id": "picks", "label": "אוסף" }
+  ],
+  "presets": [{ "name": "אזור פתיחה" }]
+}
+{% endschema %}

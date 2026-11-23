@@ -1,0 +1,36 @@
+<footer class="site" {{ section.shopify_attributes }}>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <div class="logo" style="margin-bottom:12px;text-align:start">{{ shop.name | upcase }}</div>
+        <p style="margin:0;font-size:.9rem;color:var(--muted);max-width:34ch">{{ section.settings.blurb | escape }}</p>
+      </div>
+      {%- for i in (1..2) -%}
+        {%- capture key -%}menu_{{ i }}{%- endcapture -%}
+        {%- assign m = linklists[section.settings[key]] -%}
+        {%- if m.links.size > 0 -%}
+          <div><h4>{{ m.title | escape }}</h4>{%- for link in m.links -%}<a href="{{ link.url }}">{{ link.title | escape }}</a>{%- endfor -%}</div>
+        {%- endif -%}
+      {%- endfor -%}
+      <div>
+        <h4>{{ 'footer.legal' | t }}</h4>
+        {%- for policy in shop.policies -%}<a href="{{ policy.url }}">{{ policy.title | escape }}</a>{%- endfor -%}
+        {%- if section.settings.a11y_page != blank -%}<a href="{{ section.settings.a11y_page.url }}">{{ section.settings.a11y_page.title | escape }}</a>{%- endif -%}
+      </div>
+    </div>
+    <div class="f-bot"><span>© {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}</span><span>{{ section.settings.note | escape }}</span></div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "תחתית",
+  "settings": [
+    { "type": "textarea", "id": "blurb", "label": "טקסט על החנות", "default": "תכשיטי אופנה לגברים בגימור חד ונוכחות יומיומית. בלי מחירים מנופחים, עם שקיפות מלאה ומשלוח עד הבית." },
+    { "type": "link_list", "id": "menu_1", "label": "תפריט 1", "default": "main-menu" },
+    { "type": "link_list", "id": "menu_2", "label": "תפריט 2", "default": "footer" },
+    { "type": "page", "id": "a11y_page", "label": "עמוד הצהרת נגישות" },
+    { "type": "text", "id": "note", "label": "הערה בשורה התחתונה", "default": "המחירים בשקלים" }
+  ]
+}
+{% endschema %}

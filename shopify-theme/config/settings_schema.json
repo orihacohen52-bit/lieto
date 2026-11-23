@@ -1,0 +1,25 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "LIETO",
+    "theme_version": "1.0.3",
+    "theme_author": "LIETO",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://help.shopify.com"
+  },
+  {
+    "name": "צבעים",
+    "settings": [
+      { "type": "color", "id": "color_ink", "label": "צבע טקסט וכפתורים", "default": "#14171f" },
+      { "type": "color", "id": "color_accent", "label": "צבע הדגשה (זהב)", "default": "#a7822f" }
+    ]
+  },
+  {
+    "name": "חנות",
+    "settings": [
+      { "type": "image_picker", "id": "favicon", "label": "אייקון לדפדפן (Favicon)" },
+      { "type": "number", "id": "free_ship_from", "label": "משלוח חינם מעל (₪)", "default": 199, "info": "רק להצגה בעגלה. את המשלוח החינמי עצמו מגדירים ב-Settings ← Shipping" },
+      { "type": "page", "id": "a11y_page", "label": "עמוד הצהרת נגישות" }
+    ]
+  }
+]

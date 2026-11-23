@@ -1,0 +1,1736 @@
+<title>LIETO</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;500&family=Heebo:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: floating pill header that rounds on scroll, editorial hero, product grid, slide-in cart, owner dashboard overlay */
+:root{
+  --bg:#f6f7f8; --surface:#ffffff; --stone:#eceef0; --ink:#14171f; --muted:#5b6170; --line:#e1e4ea;
+  --gold:#a7822f; --gold-soft:#e9dcc0; --night:#f0f1f3; --on-night:#14171f;
+  --ok:#1f7a4d; --warn:#b36b00; --bad:#b3261e;
+  --font-display:'Noto Serif Hebrew','David Libre',Georgia,serif;
+  --font-body:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --radius:14px; --fs:1; color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:calc(16px * var(--fs))}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:1rem;line-height:1.6;direction:rtl;
+  padding-block:0;padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;line-height:1.22;letter-spacing:-.005em;margin:0;text-wrap:balance}
+a{color:inherit}
+button{font:inherit;cursor:pointer;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1240px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.skip{position:absolute;top:-60px;inset-inline-start:12px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:200}
+.skip:focus{top:12px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ink)}
+/* announcement: rotating notes, plain black strip */
+.ann{background:var(--ink);color:#fff;font-size:.82rem;text-align:center;padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top,0px));min-height:36px}
+.ann span{display:inline-block;transition:opacity .35s}
+.ann b{font-weight:600}
+
+/* header: logo centred, nav at start, icons at end; floats as a rounded pill after scroll */
+.hdr-slot{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;height:0}
+.hdr{margin:0 auto;max-width:100%;background:var(--surface);border-bottom:1px solid var(--line);
+  transition:max-width .45s cubic-bezier(.2,.7,.2,1),margin .45s,border-radius .45s,box-shadow .45s,background .3s}
+.hdr.scrolled{max-width:min(1100px,calc(100% - 24px));margin-top:10px;border-radius:999px;border:1px solid var(--line);
+  box-shadow:0 10px 30px -14px rgba(20,23,31,.28);background:rgba(255,255,255,.9);
+  backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px)}
+.hdr-in{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px max(18px,env(safe-area-inset-left,0px)) 10px max(18px,env(safe-area-inset-right,0px));min-height:66px}
+.hdr-start,.hdr-end{display:flex;align-items:center;gap:4px;min-width:0}
+.hdr-end{justify-content:flex-end}
+.logo{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.3em;font-weight:500;text-decoration:none;direction:ltr;padding-inline-start:.3em}
+.logo span{color:inherit}
+.nav{display:flex;gap:22px}
+.nav a{text-decoration:none;font-size:.93rem;color:var(--ink);padding:6px 0;border-bottom:1px solid transparent}
+.nav a:hover{border-color:var(--ink)}
+.ibtn{position:relative;background:none;border:1px solid transparent;border-radius:999px;width:42px;height:42px;display:grid;place-items:center}
+.ibtn:hover{background:var(--bg)}
+.ibtn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.badge[hidden]{display:none}
+.badge{position:absolute;top:3px;inset-inline-start:3px;min-width:17px;height:17px;border-radius:9px;background:var(--ink);color:#fff;font-size:.66rem;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.burger{display:none}
+
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 26px;border-radius:999px;border:1px solid transparent;font-weight:600;text-decoration:none;transition:transform .2s,background .2s}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:#14110a}
+.btn-gold:hover{background:color-mix(in srgb,var(--gold) 85%,#fff)}
+.btn-ghost{border-color:color-mix(in srgb,var(--on-night) 35%,transparent);color:var(--on-night)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-ink:hover{background:#2a2f3b}
+.btn-line{border-color:var(--line);background:var(--surface)}
+.btn-line:hover{border-color:var(--gold)}
+.btn-sm{padding:8px 16px;font-size:.88rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* hero: shop window. text + three real picks on one side, one product shot with its price on the other */
+.hero{background:var(--surface);padding-top:66px;border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:56px;align-items:center;padding-block:48px 56px}
+.kicker{font-size:.9rem;color:var(--muted);margin:0 0 14px}
+.kicker b{color:var(--ink);font-weight:600}
+.hero h1{font-size:clamp(2.3rem,4.6vw,3.7rem);font-weight:300;letter-spacing:-.01em;margin:0 0 18px}
+.lead{max-width:44ch;color:var(--muted);font-size:1.05rem;margin:0 0 28px}
+.hero-cta{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.txtlink{color:var(--ink);text-underline-offset:5px;text-decoration-thickness:1px;font-size:.95rem}
+.txtlink:hover{color:var(--gold)}
+.picks{margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
+.picks-h{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--muted);margin-bottom:12px}
+.picks-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pick{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:center;background:none;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:start}
+.pick:hover{border-color:var(--ink)}
+.pick .th{width:52px;height:52px;border-radius:8px;background:var(--stone);display:grid;place-items:center;overflow:hidden}
+.pick .th svg{width:80%;height:80%}.pick .th img{width:100%;height:100%;object-fit:cover}
+.pick span{font-size:.8rem;line-height:1.35;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pick b{font-size:.85rem;font-variant-numeric:tabular-nums}
+.hero-fig{margin:0;display:grid;gap:12px}
+.stage{position:relative;aspect-ratio:5/4;max-width:100%;width:100%;border:0;padding:0;border-radius:6px;overflow:hidden;
+  background:radial-gradient(120% 90% at 30% 20%,#fbfbfa 0%,var(--stone) 60%,#dcdfe3 100%)}
+.stage::after{content:"";position:absolute;left:22%;right:22%;bottom:13%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(20,23,31,.22),transparent)}
+.stage svg{position:relative;z-index:1;width:56%;height:auto;margin-top:2%;transition:transform .6s}
+.stage:hover svg{transform:translateY(-4px) rotate(-3deg)}
+.stage.photo{background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.stage.photo::after{display:none}
+.stage.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:4% 8%;transition:transform .6s}
+.stage.photo:hover img{transform:scale(1.03)}
+.stage.photo.wide img{object-fit:cover;object-position:left center;padding:0}
+.hflag{position:absolute;bottom:0;inset-inline:0;z-index:2;background:linear-gradient(0deg,rgba(12,12,14,.82),rgba(12,12,14,0));color:#f4efe6;padding:40px 22px 16px;display:flex;align-items:baseline;gap:12px;font-size:.8rem}
+.hflag i{font-style:normal;letter-spacing:.22em;text-transform:uppercase;color:#dfc492;font-size:.72rem}
+.hflag b{font-family:var(--font-display);font-weight:400;font-size:1.25rem;letter-spacing:.01em}
+.hcap-reg{color:var(--muted);font-size:.95rem}
+.hcap-terms{color:var(--muted);font-size:.78rem}
+.hcap-left{color:var(--ink);font-weight:600}
+.hcap-terms .lnk{font-size:.78rem;color:inherit}
+.hdeal{position:absolute;top:18px;inset-inline-start:18px;z-index:2;width:92px;height:92px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-content:center;text-align:center;line-height:1;box-shadow:0 10px 24px -10px rgba(20,23,31,.5);transform:rotate(-8deg)}
+.hdeal b{font-family:var(--font-display);font-size:2rem;font-weight:500;direction:ltr}
+.hdeal small{font-size:.78rem;margin-top:4px;letter-spacing:.04em}
+.hcap{display:flex!important;align-items:center!important;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
+.hcap-t{display:grid;gap:2px;min-width:0}
+.hcap-n{font-size:.95rem}
+.hcap-p{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hcap-p b{font-size:1.5rem;font-variant-numeric:tabular-nums}
+.hcap-p s{color:var(--muted);font-size:1rem}
+.hcap-p em{font-style:normal;font-size:.82rem;font-weight:500;color:var(--gold);letter-spacing:.02em}
+.stage .note{position:absolute;top:16px;inset-inline-start:16px;z-index:2;background:#fff;border-radius:999px;padding:5px 12px;font-size:.78rem}
+.hero-fig figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:.92rem;flex-wrap:wrap}
+.hero-fig figcaption s{color:var(--muted);margin-inline-start:6px;font-size:.85rem}
+.hero-fig figcaption button:not(.btn){background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:4px}
+
+/* trust bar */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--line);background:var(--surface)}
+.trust div{padding:22px 18px;display:flex;gap:14px;align-items:center;border-inline-start:1px solid var(--line)}
+.trust div:first-child{border-inline-start:0}
+.trust svg{width:28px;height:28px;stroke:var(--gold);fill:none;stroke-width:1.5;flex:none}
+.trust b{display:block;font-size:.95rem}
+.trust span{font-size:.82rem;color:var(--muted)}
+
+section.blk{padding-block:72px}
+.sec-h{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:32px}
+.sec-h h2{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:400}
+.sec-h p{margin:6px 0 0;color:var(--muted);max-width:52ch}
+
+/* categories */
+.cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:22px;text-align:start;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+.cat:hover{border-color:var(--gold);transform:translateY(-3px)}
+.cat svg{width:100%;height:96px}
+.cat b{font-family:var(--font-display);font-size:1.25rem;font-weight:500}
+.cat small{color:var(--muted)}
+
+/* toolbar */
+.tools{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 18px;font-size:.92rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.field{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;min-width:0}
+.tools .field{min-height:42px}
+.grow{flex:1;min-width:180px}
+
+/* product grid */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .25s,border-color .25s}
+.card:hover{box-shadow:0 20px 40px -22px rgba(10,14,30,.4);border-color:var(--gold)}
+.pic{position:relative;aspect-ratio:4/5;overflow:hidden;background:linear-gradient(160deg,var(--bg),color-mix(in srgb,var(--gold-soft) 60%,var(--bg)));display:grid;place-items:center;border:0;padding:0;width:100%}
+.pic svg,.pic img{width:72%;height:72%;object-fit:contain;transition:transform .5s}
+.pic img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.gal{background:var(--stone);display:grid;gap:10px;align-content:start;padding-bottom:12px;min-width:0}
+.gal-stage{position:relative;aspect-ratio:4/5;max-width:100%;overflow:hidden;display:grid;place-items:center;background:var(--stone)}
+.gal-stage img,.gal-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:galIn .45s ease}
+.gal-stage>svg{width:70%;height:70%}
+@keyframes galIn{from{opacity:.25}to{opacity:1}}
+.gal-thumbs{display:flex;gap:8px;padding:0 12px;overflow-x:auto}
+.gal-th{position:relative;width:62px;aspect-ratio:4/5;border:1px solid var(--line);border-radius:8px;overflow:hidden;padding:0;background:var(--surface);flex:none;opacity:.75;transition:opacity .2s}
+.gal-th:hover{opacity:1}
+.gal-th[aria-pressed="true"]{border:2px solid var(--ink);opacity:1}
+.gal-th img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-th .play{position:absolute;bottom:4px;inset-inline-start:4px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:8px;color:#14171f}
+.vtoggle{position:absolute;bottom:14px;inset-inline-end:14px;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.88);border:0;display:grid;place-items:center;font-size:12px;color:#14171f}
+.pic video.hov{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s;pointer-events:none}
+.pic video.hov.on{opacity:1}
+.vbadge{position:absolute;bottom:10px;inset-inline-start:10px;background:rgba(255,255,255,.92);color:#14171f;font-size:.7rem;padding:3px 9px;border-radius:999px;z-index:1}
+.card:hover .pic svg{transform:scale(1.06) rotate(-2deg)}
+.tag{position:absolute;top:12px;inset-inline-start:12px;background:var(--ink);color:var(--bg);font-size:.72rem;padding:4px 10px;border-radius:999px;letter-spacing:.04em}
+.tag.sale{background:var(--gold);color:#14110a}
+.wish{position:absolute;top:8px;inset-inline-end:8px;background:color-mix(in srgb,var(--surface) 85%,transparent);border:0;border-radius:50%;width:38px;height:38px;display:grid;place-items:center}
+.wish svg{width:19px;height:19px;stroke:var(--ink);fill:none;stroke-width:1.7}
+.wish[aria-pressed="true"] svg{fill:var(--bad);stroke:var(--bad)}
+.cbody{padding:16px 18px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cbody h3{font-size:1.12rem;font-weight:500}
+.cbody .mat{font-size:.82rem;color:var(--muted)}
+.price{display:flex;gap:10px;align-items:baseline;margin-top:auto;padding-top:8px}
+.price b{font-size:1.2rem;font-variant-numeric:tabular-nums}
+.price s{color:var(--muted);font-size:.9rem}
+.cbody .btn{justify-content:center;margin-top:10px}
+.empty{padding:50px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius)}
+
+/* story band */
+.story{background:var(--night);color:var(--on-night)}
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.story h2{font-size:clamp(1.9rem,3.6vw,2.8rem);font-weight:300}
+.story p{color:color-mix(in srgb,var(--on-night) 78%,transparent);max-width:54ch}
+.steps{display:grid;gap:14px}
+.step{display:flex;gap:16px;align-items:flex-start;padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.step i{font-style:normal;font-family:var(--font-display);color:var(--gold);font-size:1.5rem;line-height:1;min-width:1.4ch}
+.step b{display:block}
+.step span{font-size:.9rem;color:color-mix(in srgb,var(--on-night) 70%,transparent)}
+
+/* bundles / marketing */
+.promo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.promo{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:10px}
+.promo h3{font-size:1.3rem}
+.promo p{margin:0;color:var(--muted);font-size:.95rem}
+.code{display:inline-block;align-self:flex-start;border:1px dashed var(--gold);color:var(--gold);padding:4px 12px;border-radius:8px;font-weight:700;letter-spacing:.08em;direction:ltr}
+.count{display:flex;gap:10px;direction:ltr}
+.count div{background:var(--bg);border:1px solid var(--line);border-radius:12px;min-width:58px;padding:8px 6px;text-align:center}
+.count b{display:block;font-size:1.3rem;font-variant-numeric:tabular-nums;font-family:var(--font-display)}
+.count span{font-size:.7rem;color:var(--muted)}
+
+/* newsletter */
+.news{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:44px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.news form{display:flex;gap:10px;flex-wrap:wrap}
+.news input{flex:1;min-width:180px}
+
+/* FAQ */
+.faq details{border-bottom:1px solid var(--line);padding:16px 0}
+.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"+";color:var(--gold);font-size:1.4rem;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);margin:10px 0 0;max-width:70ch}
+
+/* footer */
+footer{background:var(--night);color:var(--on-night);padding-block:60px 30px;margin-top:60px}
+.f-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px}
+footer h4{margin:0 0 12px;font-family:var(--font-display);font-weight:500;font-size:1.05rem;color:var(--gold)}
+footer a{display:block;text-decoration:none;color:color-mix(in srgb,var(--on-night) 75%,transparent);padding:3px 0;font-size:.92rem;background:none;border:0;text-align:start}
+footer a:hover,.flink:hover{color:var(--gold)}
+.flink{display:block;background:none;border:0;padding:3px 0;font-size:.92rem;text-align:start;color:color-mix(in srgb,var(--on-night) 75%,transparent)}
+.f-bot{border-top:1px solid var(--line);margin-top:36px;padding-top:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.82rem;color:color-mix(in srgb,var(--on-night) 60%,transparent)}
+
+/* drawers / modals */
+.scrim{position:fixed;inset:0;background:rgba(6,8,16,.55);z-index:80;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(440px,100%);background:var(--surface);z-index:90;transform:translateX(102%);visibility:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),visibility .35s;display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer.on{transform:none;visibility:visible}
+.drawer-h{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}
+.drawer-h h2{font-size:1.4rem}
+.drawer-b{flex:1;overflow:auto;padding:18px 22px}
+.drawer-f{border-top:1px solid var(--line);padding:18px 22px;display:grid;gap:10px}
+.line{display:grid;grid-template-columns:72px 1fr auto;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.line .th{width:72px;height:72px;border-radius:12px;background:var(--bg);display:grid;place-items:center;overflow:hidden}
+.line .th svg{width:80%;height:80%}.line .th img{width:100%;height:100%;object-fit:cover}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px}
+.qty button{background:none;border:0;width:32px;height:32px;font-size:1.1rem}
+.qty span{min-width:24px;text-align:center;font-variant-numeric:tabular-nums}
+.rm{background:none;border:0;color:var(--muted);font-size:.8rem;text-decoration:underline;padding:0}
+.ship-bar{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:.88rem;margin-bottom:6px}
+.meter{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--gold);transition:width .4s}
+.sum{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.sum.tot{font-weight:700;font-size:1.15rem}
+.modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.sheet{background:var(--surface);border-radius:26px;max-width:960px;width:100%;max-height:calc(100% - 8px);overflow:auto;position:relative;border:1px solid var(--line)}
+.sheet .x{position:absolute;top:14px;inset-inline-end:14px;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:50%;width:40px;height:40px}
+.pd{display:grid;grid-template-columns:1fr 1fr}
+.pd .pic{aspect-ratio:1/1;height:auto}
+.pd-i{padding:34px;display:flex;flex-direction:column;gap:14px}
+.pd-i h2{font-size:2rem}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:.92rem;margin:0}
+.spec dt{color:var(--muted)}.spec dd{margin:0}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 16px;font-size:.9rem}
+.opt[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft);color:var(--ink)}
+.doc{padding:44px;max-width:820px}
+.doc h2{font-size:2rem;margin-bottom:6px}
+.doc h3{font-size:1.2rem;margin:24px 0 6px}
+.doc p,.doc li{color:var(--ink);max-width:70ch}
+.doc .note{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.88rem;color:var(--muted)}
+form.co{display:grid;gap:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label.l{display:grid;gap:4px;font-size:.86rem;color:var(--muted)}
+label.l .field{color:var(--ink)}
+.err{color:var(--bad);font-size:.84rem;min-height:1em}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:.88rem}
+.chk input{margin-top:5px;width:18px;height:18px;accent-color:var(--gold)}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));inset-inline-start:50%;transform:translate(50%,20px);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:999px;z-index:300;opacity:0;pointer-events:none;transition:.3s;max-width:calc(100% - 32px);text-align:center}
+html[dir] .toast{left:50%;right:auto;inset-inline-start:auto;transform:translate(-50%,20px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* cookie / consent */
+.cookie{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));inset-inline:14px;max-width:560px;margin-inline:auto;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 20px;z-index:70;box-shadow:0 20px 50px -20px rgba(0,0,0,.5);display:none;gap:12px;flex-wrap:wrap;align-items:center;font-size:.9rem}
+.cookie.on{display:flex}.cookie p{margin:0;flex:1;min-width:200px}
+
+/* accessibility widget */
+.a11y-btn{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:calc(18px + env(safe-area-inset-left,0px));width:54px;height:54px;border-radius:50%;border:2px solid #fff;background:#1a56db;color:#fff;z-index:75;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.a11y-btn svg{width:30px;height:30px;fill:#fff}
+.a11y{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom,0px));left:calc(18px + env(safe-area-inset-left,0px));width:min(330px,calc(100% - 36px));background:var(--surface);border:1px solid var(--line);border-radius:22px;z-index:76;padding:18px;display:none;box-shadow:0 24px 60px -20px rgba(0,0,0,.55);max-height:70vh;overflow:auto}
+.a11y.on{display:block}
+.a11y h2{font-size:1.2rem;margin-bottom:12px;font-family:var(--font-body);font-weight:700}
+.a11y-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.a11y-g button{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 8px;font-size:.85rem;min-height:56px}
+.a11y-g button[aria-pressed="true"]{background:#1a56db;color:#fff;border-color:#1a56db}
+.a11y .reset{margin-top:10px;width:100%;border:1px solid var(--line);background:none;border-radius:12px;padding:10px}
+body.a-contrast{--bg:#000;--surface:#000;--ink:#fff;--muted:#ffe;--line:#fff;--gold:#ffd400;--night:#000;--on-night:#fff}
+body.a-contrast *{border-color:#fff!important}
+body.a-light{--bg:#fff;--surface:#fff;--ink:#000;--muted:#222;--line:#444;--night:#1a1a1a}
+body.a-gray{filter:grayscale(1)}
+body.a-links a{text-decoration:underline!important;outline:1px dashed currentColor}
+body.a-font,body.a-font *{font-family:Arial,Helvetica,sans-serif!important}
+body.a-spacing{letter-spacing:.06em;word-spacing:.18em;line-height:1.9}
+body.a-still *,body.a-still *::before{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+body.a-cursor,body.a-cursor *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M4 2l26 14-11 3-5 11z' fill='black' stroke='white' stroke-width='2'/%3E%3C/svg%3E") 4 2,auto!important}
+body.a-focus *:focus{outline:4px solid #ff0!important;outline-offset:3px}
+
+/* admin */
+.adm{position:fixed;inset:0;z-index:120;background:var(--bg);display:none;overflow:auto;padding-top:env(safe-area-inset-top,0px)}
+.adm.on{display:block}
+.adm-top{position:sticky;top:0;background:var(--night);color:var(--on-night);z-index:3;display:flex;gap:14px;align-items:center;padding:12px max(16px,env(safe-area-inset-left,0px));flex-wrap:wrap}
+.adm-top .logo{font-size:1.2rem}
+.adm-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.adm-tabs button{background:none;border:1px solid transparent;color:var(--on-night);border-radius:999px;padding:7px 16px;font-size:.9rem}
+.adm-tabs button[aria-selected="true"]{background:var(--gold);color:#14110a}
+.adm-body{max-width:1300px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-left,0px)) 60px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.kpi span{font-size:.82rem;color:var(--muted)}
+.kpi b{display:block;font-family:var(--font-display);font-size:1.8rem;font-weight:500;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px;min-width:0}
+.panel h3{font-size:1.2rem;margin-bottom:12px}
+.two{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:640px}
+th,td{padding:10px 12px;text-align:start;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.78rem;white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.76rem;border:1px solid currentColor}
+.pill.new{color:var(--warn)}.pill.paid,.pill.shipped{color:var(--ok)}.pill.cancel{color:var(--bad)}.pill.ordered{color:var(--gold)}
+.adm select,.adm input{background:var(--surface)}
+.ctrls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.bars{display:flex;align-items:flex-end;gap:3px;height:180px;direction:ltr;padding-top:10px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:1px;min-width:0;height:100%;position:relative}
+.bar i{display:block;border-radius:3px 3px 0 0;min-height:0}
+.bar .rv{background:var(--gold)}.bar .pf{background:var(--ok)}
+.axis{display:flex;justify-content:space-between;direction:ltr;font-size:.74rem;color:var(--muted);margin-top:6px}
+.legend{display:flex;gap:16px;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px}
+.hbar{display:grid;grid-template-columns:minmax(80px,140px) 1fr auto;gap:10px;align-items:center;font-size:.88rem;margin:8px 0}
+.hbar div{height:10px;background:var(--bg);border-radius:5px;overflow:hidden}.hbar div i{display:block;height:100%;background:var(--gold)}
+.note-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.88rem;color:var(--muted);margin-bottom:16px}
+.lockbox{max-width:460px;margin:12vh auto;text-align:center;padding:30px}
+
+.step2{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.step2.done{border-color:var(--ok)}
+.step2 h3{font-size:1.15rem;margin-bottom:6px}
+.step2 p{margin:0 0 10px}
+.supname{font-size:.8rem;color:var(--muted);margin-top:2px;text-align:start}
+.pickvar{margin-top:4px;font-size:.86rem;background:var(--gold-soft);border-radius:8px;padding:4px 10px;display:inline-block}
+.okline{color:var(--ok);font-weight:600}
+.fitem{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line)}
+pre.addr{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;direction:ltr;text-align:left;font-size:.85rem;white-space:pre-wrap;margin:0 0 8px;overflow-x:auto}
+.cpy textarea{width:100%;margin-top:6px;direction:rtl}
+.calc{background:var(--bg);border:1px dashed var(--gold);border-radius:12px;padding:12px 14px;font-size:.9rem}
+.lnk{background:none;border:0;padding:0;text-decoration:underline;font-size:.78rem;direction:ltr}
+.noposter{display:block;width:100%;height:100%;background:#1c2029}
+.drop{border:1.5px dashed var(--line);border-radius:14px;padding:16px;text-align:center;background:var(--bg);cursor:pointer;display:block;transition:border-color .2s,background .2s}
+.drop:hover,.drop.over{border-color:var(--ink);background:var(--surface)}
+.drop b{display:block;font-size:.95rem}.drop small{color:var(--muted)}
+.prev{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.prev-i{position:relative;width:72px;aspect-ratio:4/5;border-radius:8px;overflow:hidden;background:var(--stone);border:1px solid var(--line)}
+.prev-i img,.prev-i video{width:100%;height:100%;object-fit:cover;display:block}
+.prev-i button{position:absolute;top:3px;inset-inline-end:3px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(255,255,255,.92);font-size:11px;line-height:1;color:#14171f}
+.prev-i .k{position:absolute;bottom:3px;inset-inline-start:3px;background:rgba(20,23,31,.75);color:#fff;font-size:.62rem;padding:1px 6px;border-radius:999px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.mitem{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);display:flex;flex-direction:column}
+.mitem.main{border:2px solid var(--ink)}
+.mth{position:relative;aspect-ratio:4/5;background:var(--stone)}
+.mth img,.mth video{width:100%;height:100%;object-fit:cover;display:block}
+.mth .k{position:absolute;top:8px;inset-inline-start:8px;background:rgba(20,23,31,.78);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:999px}
+.mbtns{display:flex;gap:4px;padding:8px;flex-wrap:wrap}
+.mbtns button{flex:1 1 auto;min-width:40px;white-space:nowrap;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 4px;font-size:.78rem}
+.mbtns button:hover{border-color:var(--ink)}
+.mbtns button[disabled]{opacity:.35;cursor:default}
+.prog{font-size:.88rem;color:var(--muted);min-height:1.4em;margin-top:8px}
+.rcline{margin-top:10px;font-size:.88rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.rc-host{position:fixed;top:0;left:-12000px;z-index:-1;pointer-events:none}
+.rc{width:794px;min-height:1123px;box-sizing:border-box;padding:56px 60px;background:#fff;color:#14171f;font-family:'Heebo',Arial,sans-serif;direction:rtl;position:relative;font-size:14px;line-height:1.55}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:22px;border-bottom:2px solid #14171f}
+.rc-logo{max-height:64px;max-width:220px;object-fit:contain}
+.rc-word{font-family:'Noto Serif Hebrew',Georgia,serif;font-size:34px;letter-spacing:.3em;direction:ltr}
+.rc-biz{display:grid;gap:1px;text-align:left;font-size:13px;color:#3d4250}
+.rc-biz b{font-size:15px;color:#14171f}
+.rc-head{display:flex;justify-content:space-between;align-items:center;margin:28px 0 18px}
+.rc-head h1{font-family:'Noto Serif Hebrew',Georgia,serif;font-weight:500;font-size:28px;margin:0}
+.rc-tag{border:1px solid #14171f;border-radius:999px;padding:3px 14px;font-size:12px}
+.rc-meta{display:grid;grid-template-columns:1fr 1fr 2fr;gap:14px;background:#f4f5f7;border-radius:10px;padding:14px 18px;margin-bottom:22px}
+.rc-meta div{display:grid;gap:1px}.rc-meta small{color:#5b6170;font-size:11px}.rc-meta span{font-size:12.5px;color:#3d4250}
+.rc-t{width:100%;border-collapse:collapse;margin-bottom:16px;min-width:0}
+.rc-t th{background:#14171f;color:#fff;font-weight:500;font-size:12px;padding:8px 12px;text-align:right;position:static}
+.rc-t td{padding:9px 12px;border-bottom:1px solid #e1e4ea;font-size:13px}
+.rc-t td:not(:first-child),.rc-t th:not(:first-child){text-align:left;white-space:nowrap}
+.rc-t small{color:#5b6170}
+.rc-sum{margin:0 0 24px auto;margin-right:auto;margin-left:0;width:300px;display:grid;gap:4px}
+.rc-sum div{display:flex;justify-content:space-between;font-size:13px}
+.rc-sum .tot{border-top:2px solid #14171f;padding-top:8px;margin-top:4px;font-size:18px;font-weight:700}
+.rc-sum p{margin:6px 0 0;font-size:11.5px;color:#5b6170}
+.rc-pay th{background:#f4f5f7;color:#14171f}
+.rc-void{color:#b3261e;font-weight:600}
+.rc.void::after{content:"מבוטלת";position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-24deg);font-size:120px;font-weight:800;color:rgba(179,38,30,.13);letter-spacing:.1em}
+.rc-foot{position:absolute;bottom:40px;left:60px;right:60px;display:flex;justify-content:space-between;border-top:1px solid #e1e4ea;padding-top:12px;font-size:11px;color:#5b6170}
+.lb-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lb-item{position:relative;display:block;overflow:hidden;aspect-ratio:3/4;background:var(--stone);border-radius:var(--radius);border:0;padding:0;width:100%}
+.lb-item img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;transition:transform .7s}
+.lb-item:hover img{transform:scale(1.04)}
+.lb-cap{position:absolute;bottom:12px;inset-inline-start:12px;background:rgba(255,255,255,.92);color:var(--ink);font-size:.8rem;padding:5px 12px;border-radius:999px}
+@media (max-width:760px){.lb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.vhero{position:relative;padding-top:66px;background:#0c0c0e;line-height:0}
+.vhero video{display:block;width:100%;aspect-ratio:16/9;max-height:calc(100vh - 66px);object-fit:cover;background:#0c0c0e}
+.vh-link{position:absolute;inset:66px 0 0 0;z-index:1}
+.vh-toggle{position:absolute;top:80px;left:calc(14px + env(safe-area-inset-left,0px));z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(12,12,14,.55);color:#fff;font-size:11px;line-height:1}
+body.has-vhero .hero{padding-top:0}
+.vh-cap{display:none;position:absolute;inset:auto 0 0 0;z-index:2;flex-direction:column;align-items:flex-start;gap:6px;padding:70px 20px 24px;background:linear-gradient(180deg,rgba(10,10,12,0),rgba(10,10,12,.82) 55%);color:#f4efe6;line-height:1.3;pointer-events:none}
+.vh-cap>*{transition:opacity .35s ease,transform .35s ease}
+.vh-cap.swap>*{opacity:0;transform:translateY(6px)}
+.vh-k{font-size:.72rem;letter-spacing:.16em;color:#dfc492;display:flex;align-items:center;gap:8px}
+.vh-k::before{content:"";width:18px;height:1px;background:#dfc492;opacity:.7}
+.vh-h{font-family:var(--font-display);font-weight:300;font-size:1.65rem;line-height:1.22;text-wrap:balance}
+.vh-s{font-size:.8rem;color:rgba(244,239,230,.74)}
+.vh-cta{pointer-events:auto;margin-top:8px;border:1px solid rgba(223,196,146,.7);color:#f4efe6;text-decoration:none;font-size:.82rem;padding:8px 16px;border-radius:2px;background:rgba(10,10,12,.35)}
+@media (prefers-reduced-motion:reduce){.vh-cap>*{transition:none}}
+.tier-nudge{background:var(--gold-soft);border-radius:12px;padding:10px 14px;font-size:.86rem;margin-bottom:8px}
+@media (max-width:1000px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cats{grid-template-columns:repeat(2,1fr)}
+  .cats .cat:last-child:nth-child(odd){grid-column:1/-1}
+  .trust{grid-template-columns:repeat(2,1fr)}
+  .trust div:nth-child(3){border-inline-start:0}
+  .promo-grid{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr 1fr}
+  .two{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .nav{display:none}
+  .burger{display:grid}
+  .hero-grid,.story-grid,.news,.pd{grid-template-columns:1fr}
+  .hero-grid{gap:28px;padding-block:28px 40px}
+  .hero-fig{order:-1}
+  .picks-row{grid-template-columns:1fr}
+  .hdr-in{grid-template-columns:auto 1fr auto;gap:2px}
+  .logo{text-align:center}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .cbody{padding:12px}
+  .cbody .btn{padding:10px 12px;font-size:.88rem}
+  .news{padding:26px}
+  section.blk{padding-block:48px}
+  .doc,.pd-i{padding:24px}
+  .row2{grid-template-columns:1fr}
+  .logo{font-size:1.35rem;letter-spacing:.24em}
+  .hdr.scrolled{border-radius:28px}
+  .hdr-in{gap:6px}
+}
+.mnav{position:fixed;inset:0;background:var(--night);color:var(--on-night);z-index:92;display:none;flex-direction:column;gap:8px;padding:90px 30px 30px}
+.mnav.on{display:flex}
+.mnav a,.mnav button{font-family:var(--font-display);font-size:1.8rem;text-decoration:none;background:none;border:0;text-align:start;padding:6px 0;color:var(--on-night)}
+.mnav .close{position:absolute;top:calc(18px + env(safe-area-inset-top,0px));inset-inline-end:20px;font-size:2rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* ===== mobile polish ===== */
+.toast{left:50%!important;right:auto!important;inset-inline-start:auto!important;transform:translate(-50%,20px)!important;width:max-content;max-width:calc(100% - 32px)}
+.toast.on{transform:translate(-50%,0)!important}
+.news form .chk{flex-basis:100%}
+.news form .chk input{flex:0 0 18px;min-width:0;width:18px}
+@media (max-width:760px){
+  .vhero.vh-mobile video{aspect-ratio:4/5;max-height:calc(100svh - 120px);object-position:center top}
+  .vhero.vh-mobile .vh-cap{display:flex}
+  section.blk{padding-block:40px}
+  .sec-h{margin-bottom:20px}
+  .sec-h h2{font-size:1.65rem}
+  .sec-h p{font-size:.92rem}
+  /* hero product block */
+  .hero-grid{gap:20px;padding-block:20px 32px}
+  .hero h1{font-size:2.1rem;margin-bottom:12px}
+  .lead{font-size:.97rem;margin-bottom:20px}
+  .hcap{gap:10px}
+  .hcap .btn{width:100%;justify-content:center;padding-block:13px}
+  .hcap-terms{line-height:1.6}
+  .picks{margin-top:26px}
+  .pick{padding:6px}
+  /* trust: compact 2x2 */
+  .trust div{padding:14px 12px;gap:10px}
+  .trust svg{width:22px;height:22px}
+  .trust b{font-size:.84rem;line-height:1.35}
+  .trust span{font-size:.74rem;line-height:1.4}
+  /* categories: one swipeable row */
+  .cats{display:flex;overflow-x:auto;gap:10px;scroll-snap-type:x mandatory;padding-bottom:6px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
+  .cats::-webkit-scrollbar{display:none}
+  .cats .cat{flex:0 0 132px;scroll-snap-align:start;padding:14px;gap:6px;grid-column:auto!important}
+  .cat svg{height:58px}
+  .cat b{font-size:1.02rem}
+  .cat small{font-size:.78rem}
+  /* collection tools */
+  .tools{gap:8px}
+  .chips{flex-wrap:nowrap;overflow-x:auto;width:100%;scrollbar-width:none;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;padding:7px 15px;font-size:.88rem}
+  .tools .grow{flex:1 1 0;min-width:0}
+  .tools select.field{flex:0 0 auto;width:auto}
+  /* product cards */
+  .grid{gap:10px}
+  .cbody{padding:10px 10px 12px;gap:3px}
+  .cbody h3{font-size:.95rem;line-height:1.3}
+  .cbody .mat{display:none}
+  .price{padding-top:4px}
+  .price b{font-size:1.02rem}
+  .cbody .btn{padding:9px 8px;font-size:.82rem;margin-top:8px}
+  .tag{top:8px;inset-inline-start:8px;font-size:.66rem;padding:3px 8px}
+  .wish{width:32px;height:32px;top:6px;inset-inline-end:6px}
+  /* lookbook */
+  .lb-cap{font-size:.72rem;padding:4px 10px;bottom:8px;inset-inline-start:8px}
+  /* offers / steps / newsletter */
+  .promo{padding:20px}
+  .count div{min-width:52px}
+  .step{padding:14px}
+  .news{padding:22px;border-radius:20px;gap:18px}
+  .news h2{font-size:1.6rem!important}
+  .news form input{flex-basis:100%}
+  .news form .btn{width:100%;justify-content:center}
+  /* product page: full screen, image smaller, add-to-cart always reachable */
+  .modal{padding:0;align-items:stretch}
+  .modal .sheet{border-radius:0;max-height:100%;height:100%;border:0}
+  .gal-stage{aspect-ratio:auto;height:min(56vh,480px)}
+  .pd-i{padding:18px 16px 22px;gap:12px}
+  .pd-i h2{font-size:1.55rem}
+  #pmAdd{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:3;box-shadow:0 10px 26px -8px rgba(20,23,31,.45)}
+  .sheet .x{top:calc(12px + env(safe-area-inset-top,0px))}
+  /* floating buttons smaller */
+  .a11y-btn{width:44px;height:44px;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:calc(12px + env(safe-area-inset-left,0px))}
+  .a11y-btn svg{width:24px;height:24px}
+  .a11y{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  .vh-toggle{top:74px;width:32px;height:32px}
+  /* footer */
+  .f-grid{gap:24px}
+}
+</style>
+
+<a class="skip" href="#main">דלג לתוכן הראשי</a>
+<div class="ann" id="ann" role="region" aria-label="הודעת חנות" aria-live="polite"><span id="annTxt">משלוח חינם בהזמנה מעל <b id="annFree">₪199</b></span></div>
+
+<div class="hdr-slot"><header class="hdr" id="hdr">
+  <div class="hdr-in">
+    <div class="hdr-start">
+      <button class="ibtn burger" id="burger" aria-label="פתח תפריט"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <nav class="nav" aria-label="ניווט ראשי"><a href="#collection">חנות</a><a href="#categories">קטגוריות</a><a href="#offers">מבצעים</a><a href="#how">משלוחים</a><a href="#" data-track>מעקב הזמנה</a></nav>
+    </div>
+    <a class="logo" href="#top" aria-label="LIETO, דף הבית">LIETO</a>
+    <div class="hdr-end">
+      <button class="ibtn" id="btnSearch" aria-label="חיפוש"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      <button class="ibtn" id="btnWish" aria-label="מועדפים"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg><span class="badge" id="wishN" hidden>0</span></button>
+      <button class="ibtn" id="btnCart" aria-label="פתח עגלת קניות"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11H6.2z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg><span class="badge" id="cartN" hidden>0</span></button>
+      <button class="ibtn" id="btnAdmin" aria-label="ניהול החנות" hidden><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+    </div>
+  </div>
+</header></div>
+
+<main id="main">
+<section class="vhero" id="vhero" hidden aria-label="LIETO, הקולקציה החדשה">
+  <a class="vh-link" href="#collection" aria-label="לקולקציה החדשה"></a>
+  <video id="vhVideo" muted loop playsinline preload="auto" aria-hidden="true"></video>
+  <button class="vh-toggle" id="vhToggle" type="button" aria-label="השהיית הסרטון">❚❚</button>
+  <div class="vh-cap" id="vhCap" aria-hidden="true"><span class="vh-k"></span><b class="vh-h"></b><span class="vh-s"></span><a class="vh-cta" href="#collection" tabindex="-1">לקולקציה החדשה ←</a></div>
+</section>
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker"><b>LIETO</b> · היוקרה, המחיר והחוויה</p>
+      <h1>נראה יקר.<br>עולה הגיוני.</h1>
+      <p class="lead">שרשראות, צמידים וסטים שמשדרגים כל לוק, מחולצה לבנה ועד ערב חגיגי. משלוח עד הבית עם מספר מעקב, ו-14 יום להחזרה.</p>
+      <div class="hero-cta"><a class="btn btn-ink" href="#collection">לקולקציה</a><a class="txtlink" href="#how">איך זה מגיע אליכם</a></div>
+      <div class="picks"><div class="picks-h"><span>הבחירות שלנו</span><a class="txtlink" href="#collection" style="font-size:.84rem">הכל</a></div><div class="picks-row" id="heroPicks"></div></div>
+    </div>
+    <figure class="hero-fig" id="heroFig"></figure>
+  </div>
+</section>
+
+<div class="trust">
+  <div><svg viewBox="0 0 32 32"><path d="M3 9h17v13H3zM20 13h6l3 4v5h-9"/><circle cx="9" cy="24" r="2.500"/><circle cx="24" cy="24" r="2.500"/></svg><p style="margin:0"><b>מספר מעקב לכל הזמנה</b><span>יודעים בדיוק איפה החבילה</span></p></div>
+  <div><svg viewBox="0 0 32 32"><path d="M16 3l11 4v8c0 7-5 12-11 14C10 27 5 22 5 15V7z"/><path d="M11 16l4 4 7-8"/></svg><p style="margin:0"><b>תשלום מאובטח</b><span>פרטי האשראי לא נשמרים אצלנו</span></p></div>
+  <div><svg viewBox="0 0 32 32"><path d="M6 16a10 10 0 0118-5M26 16a10 10 0 01-18 5"/><path d="M24 5v6h-6M8 27v-6h6"/></svg><p style="margin:0"><b>14 יום להחזרה</b><span>לא התאהבתם? מחזירים</span></p></div>
+  <div><svg viewBox="0 0 32 32"><path d="M5 8h22v14H12l-6 5z"/></svg><p style="margin:0"><b>שירות אישי בעברית</b><span>עונים בימים א׳–ה׳</span></p></div>
+</div>
+
+<section class="blk" id="categories"><div class="wrap">
+  <div class="sec-h"><div><div class="eyebrow">קטגוריות</div><h2>מה מחפשים?</h2></div></div>
+  <div class="cats" id="cats"></div>
+</div></section>
+
+<section class="blk" id="lookbook" hidden style="padding-top:10px"><div class="wrap"><div class="sec-h"><div><div class="eyebrow">השראה</div><h2>איך לוקים את זה</h2><p>שרשרת אחת על טי-שירט, או שכבות לערב. לחיצה על תמונה פותחת את התכשיט.</p></div></div><div class="lb-grid" id="lbGrid"></div></div></section>
+
+<section class="blk" id="collection" style="padding-top:20px"><div class="wrap">
+  <div class="sec-h"><div><div class="eyebrow">הקולקציה</div><h2>כל התכשיטים</h2><p>משלוח חינם בהזמנה מעל ₪199 · 14 יום להחזרה</p></div></div>
+  <div class="tools">
+    <div class="chips" id="chips" role="group" aria-label="סינון לפי קטגוריה"></div>
+    <label class="sr" for="q">חיפוש מוצר</label>
+    <input class="field grow" id="q" type="search" placeholder="חיפוש לפי שם או חומר" autocomplete="off">
+    <label class="sr" for="sort">מיון</label>
+    <select class="field" id="sort"><option value="feat">מומלצים</option><option value="pa">מחיר: מהנמוך לגבוה</option><option value="pd">מחיר: מהגבוה לנמוך</option><option value="sale">הנחה גבוהה</option></select>
+  </div>
+  <div class="grid" id="grid" aria-live="polite"></div>
+  <div id="recentWrap" hidden style="margin-top:56px"><div class="sec-h"><h2 style="font-size:1.6rem">נצפו לאחרונה</h2></div><div class="grid" id="recent"></div></div>
+</div></section>
+
+<section class="blk" id="offers" style="padding-top:20px"><div class="wrap">
+  <div class="sec-h"><div><div class="eyebrow">הטבות</div><h2>3 דרכים לשלם פחות</h2></div></div>
+  <div class="promo-grid">
+    <div class="promo"><h3>10% על ההזמנה הראשונה</h3><p>פעם ראשונה אצלנו? מזינים את הקוד בעגלה.</p><span class="code">LIETO10</span></div>
+    <div class="promo"><h3>בונים סט, משלמים פחות</h3><p>2 פריטים: 15% הנחה. 3 פריטים ומעלה: 20% הנחה. ההנחה נכנסת לעגלה לבד, בלי קוד.</p><span class="code">2 = 15% · 3 = 20%</span></div>
+    <div class="promo" id="promoCard"><h3>מבצע השקה</h3><p id="promoTxt">הנחה על כל ההזמנה לזמן מוגבל.</p><span class="code" id="promoCode"></span><div class="count" id="count" aria-live="off"></div><small style="color:var(--muted)" id="promoEnd"></small></div>
+  </div>
+</div></section>
+
+<section class="blk story" id="how"><div class="wrap story-grid">
+  <div><div class="eyebrow">איך זה עובד</div><h2 style="margin-block:12px 16px">מההזמנה ועד הדלת</h2>
+    <p>כל הזמנה נארזת ונשלחת אליכם עם מספר מעקב, כך שאתם יודעים בכל רגע איפה החבילה. זמן אספקה: 10 עד 25 ימי עסקים.</p></div>
+  <div class="steps">
+    <div class="step"><i>1</i><div><b>בוחרים</b><span>מזמינים באתר ומקבלים אישור למייל.</span></div></div>
+    <div class="step"><i>2</i><div><b>אנחנו מטפלים</b><span>ההזמנה יוצאת לטיפול תוך יום עסקים.</span></div></div>
+    <div class="step"><i>3</i><div><b>החבילה בדרך</b><span>מספר מעקב מגיע אליכם ברגע שהיא יוצאת.</span></div></div>
+    <div class="step"><i>4</i><div><b>לא מושלם? מחזירים</b><span>14 יום להחזרה, לפי התקנון.</span></div></div>
+  </div>
+</div></section>
+
+<section class="blk"><div class="wrap">
+  <div class="news">
+    <div><div class="eyebrow">ניוזלטר</div><h2 style="margin-block:8px 10px;font-size:2rem">10% על ההזמנה הראשונה</h2><p style="margin:0;color:var(--muted)">השאירו מייל וקבלו את הקוד, ותהיו הראשונים לשמוע על קולקציות חדשות ומבצעים. בלי ספאם, אפשר להסיר בכל רגע.</p></div>
+    <div>
+      <form id="newsForm" novalidate>
+        <label class="sr" for="newsMail">כתובת אימייל</label>
+        <input class="field" id="newsMail" type="email" placeholder="האימייל שלך" autocomplete="email" required>
+        <button class="btn btn-ink" type="submit">שלחו לי 10%</button>
+        <label class="chk"><input type="checkbox" id="newsOk"><span>אני מאשר/ת קבלת דיוור שיווקי מ-LIETO (ניתן לבטל בכל עת)</span></label>
+      </form>
+      <div class="err" id="newsErr" role="alert"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="blk faq" id="faq" style="padding-top:0"><div class="wrap" style="max-width:860px">
+  <div class="sec-h"><div><div class="eyebrow">שאלות נפוצות</div><h2>לפני שמזמינים</h2></div></div>
+  <details><summary>כמה זמן לוקח המשלוח?</summary><p>בדרך כלל בין 10 ל-25 ימי עסקים, בהתאם לספק ולמחסן. מספר מעקב נשלח אחרי היציאה.</p></details>
+  <details><summary>איך מבטלים או מחזירים?</summary><p>אפשר לבטל עד 14 ימים מקבלת המוצר או מאישור העסקה, לפי הנמוך מביניהם, כמפורט בתקנון. פנו אלינו דרך עמוד יצירת הקשר.</p></details>
+  <details><summary>האם התשלום מאובטח?</summary><p>התשלום מתבצע מול ספק סליקה מורשה. פרטי כרטיס האשראי לא נשמרים באתר.</p></details>
+  <details><summary>מהם החומרים?</summary><p>החומרים מצוינים בכל מוצר. אנחנו מציינים במדויק אם מדובר בכסף 925, פלדת אל חלד או ציפוי זהב, כדי שלא תופתעו.</p></details>
+  <details><summary>האם יש מכס או עלויות נוספות?</summary><p>במשלוחי תכשיטים בהיקף קטן בדרך כלל אין תשלום נוסף, אך החיוב נקבע לפי חוק ורשות המסים. פירוט בתקנון.</p></details>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div class="f-grid">
+    <div><div class="logo" style="margin-bottom:12px">LIE<span>T</span>O</div><p style="margin:0;font-size:.9rem;color:color-mix(in srgb,var(--on-night) 70%,transparent);max-width:34ch">תכשיטים שנענדים כל יום. נבחרים אחד-אחד ונשלחים עד הבית.</p></div>
+    <div><h4>החנות</h4><a href="#collection">קולקציה</a><a href="#offers">הטבות</a><a href="#how">איך זה עובד</a></div>
+    <div><h4>מידע</h4><button class="flink" data-doc="shipping">משלוחים</button><button data-doc="returns" class="flink">החזרות וביטולים</button><button data-doc="contact" class="flink">יצירת קשר</button><button class="flink" data-track>מעקב הזמנה</button></div>
+    <div><h4>משפטי</h4><button data-doc="terms" class="flink">תקנון האתר</button><button data-doc="privacy" class="flink">מדיניות פרטיות</button><button data-doc="a11y" class="flink">הצהרת נגישות</button></div>
+  </div>
+  <div class="f-bot"><span>© <span id="yr"></span> LIETO. כל הזכויות שמורות.</span><span>המחירים בשקלים חדשים וכוללים מע״מ</span></div>
+</div></footer>
+
+<!-- overlays -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="cart" aria-label="עגלת קניות" aria-hidden="true">
+  <div class="drawer-h"><h2>העגלה שלי</h2><button class="ibtn" data-close aria-label="סגור עגלה">✕</button></div>
+  <div class="drawer-b" id="cartBody"></div>
+  <div class="drawer-f" id="cartFoot"></div>
+</aside>
+<aside class="drawer" id="wishD" aria-label="מועדפים" aria-hidden="true">
+  <div class="drawer-h"><h2>מועדפים</h2><button class="ibtn" data-close aria-label="סגור">✕</button></div>
+  <div class="drawer-b" id="wishBody"></div>
+</aside>
+<div class="modal" id="pm" role="dialog" aria-modal="true" aria-label="פרטי מוצר"><div class="sheet" id="pmSheet"></div></div>
+<div class="modal" id="dm" role="dialog" aria-modal="true" aria-label="מסמך"><div class="sheet" id="dmSheet"></div></div>
+<div class="modal" id="cm" role="dialog" aria-modal="true" aria-label="תשלום והשלמת הזמנה"><div class="sheet" id="cmSheet"></div></div>
+<div class="mnav" id="mnav"><button class="close" aria-label="סגור תפריט" id="mclose">✕</button><a href="#collection">קולקציה</a><a href="#categories">קטגוריות</a><a href="#offers">מבצעים</a><a href="#how">איך זה עובד</a><a href="#faq">שאלות נפוצות</a></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="cookie" id="cookie" role="dialog" aria-label="הודעת עוגיות"><p>האתר משתמש בזיכרון מקומי בדפדפן כדי לשמור עגלה ומועדפים, ובכלי מדידה לשיפור החוויה. פרטים ב<a href="#" data-doc="privacy">מדיניות הפרטיות</a>.</p><button class="btn btn-ink btn-sm" id="cookieOk">הבנתי</button></div>
+
+<button class="a11y-btn" id="a11yBtn" aria-label="תפריט נגישות" aria-expanded="false" aria-controls="a11yP"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 110 4 2 2 0 010-4zM4 8l8 1 8-1v2l-5.500 1v3l2 7.500-2 .5-2.500-6.500L9.500 21.500l-2-.5 2-7.500v-3L4 10z"/></svg></button>
+<div class="a11y" id="a11yP" role="dialog" aria-label="הגדרות נגישות">
+  <h2>נגישות</h2>
+  <div class="a11y-g">
+    <button data-a="fs+">הגדלת טקסט</button><button data-a="fs-">הקטנת טקסט</button>
+    <button data-a="a-contrast" aria-pressed="false">ניגודיות גבוהה</button><button data-a="a-light" aria-pressed="false">רקע בהיר</button>
+    <button data-a="a-gray" aria-pressed="false">גווני אפור</button><button data-a="a-links" aria-pressed="false">הדגשת קישורים</button>
+    <button data-a="a-font" aria-pressed="false">גופן קריא</button><button data-a="a-spacing" aria-pressed="false">ריווח טקסט</button>
+    <button data-a="a-still" aria-pressed="false">עצירת אנימציות</button><button data-a="a-cursor" aria-pressed="false">סמן גדול</button>
+    <button data-a="a-focus" aria-pressed="false">הדגשת פוקוס</button><button data-a="doc">הצהרת נגישות</button>
+  </div>
+  <button class="reset" data-a="reset">איפוס הגדרות</button>
+</div>
+
+<div class="adm" id="adm" role="dialog" aria-modal="true" aria-label="ממשק ניהול"></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const ESC={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>ESC[c]);
+const money=n=>{const r=Math.round(n*100)/100;return'₪'+r.toLocaleString('he-IL',{minimumFractionDigits:r%1?2:0,maximumFractionDigits:2})};
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const uid=()=>{try{const a=new Uint8Array(9);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(36).padStart(2,'0')).join('').slice(0,12)}catch(e){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}};
+const safeUrl=u=>{try{const x=new URL(u);return(x.protocol==='https:'||x.protocol==='http:')?x.href:''}catch(e){return''}};
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800)}
+$('#yr').textContent=new Date().getFullYear();
+
+/* ---------- store settings (edit these) ---------- */
+const STORE={name:'LIETO',freeShipFrom:199,shipFee:19,currency:'₪',
+  business:'[שם העסק / ח.פ. / ע.מ.]',address:'[כתובת העסק]',email:'[אימייל שירות]',phone:'[טלפון שירות]'};
+
+
+/* ---------- jewelry illustrations (inline SVG, no external images) ---------- */
+const MET={gold:['#e8cf8a','#b8923c','#7a5c1c'],silver:['#f1f3f7','#aeb4c0','#6c7380'],rose:['#f3cbbb','#c98f7c','#8d5748'],black:['#5a606e','#2b2f3a','#111319']};
+function art(type,metal,gem){
+  const m=MET[metal]||MET.gold,id='g'+Math.random().toString(36).slice(2,7),gc=gem||'#cfe8ff';
+  const grad=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${m[0]}"/><stop offset=".5" stop-color="${m[1]}"/><stop offset="1" stop-color="${m[2]}"/></linearGradient><linearGradient id="${id}s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="${gc}"/></linearGradient></defs>`;
+  const f=`url(#${id})`,gm=`url(#${id}s)`;
+  let b='';
+  if(type==='ring'){b=`<ellipse cx="100" cy="122" rx="46" ry="50" fill="none" stroke="${f}" stroke-width="12"/><path d="M82 70l18-22 18 22-18 20z" fill="${gm}" stroke="${m[2]}" stroke-width="2"/><path d="M82 70h36M100 48v42" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>`}
+  else if(type==='band'){b=`<ellipse cx="100" cy="104" rx="56" ry="60" fill="none" stroke="${f}" stroke-width="20"/><ellipse cx="100" cy="104" rx="56" ry="60" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" transform="translate(0 -8)"/>`}
+  else if(type==='necklace'){b=`<path d="M30 40C40 120 70 150 100 150s60-30 70-110" fill="none" stroke="${f}" stroke-width="3.500" stroke-dasharray="1 5" stroke-linecap="round"/><path d="M30 40C40 120 70 150 100 150s60-30 70-110" fill="none" stroke="${f}" stroke-width="2.400"/><circle cx="100" cy="164" r="13" fill="${gm}" stroke="${f}" stroke-width="4"/>`}
+  else if(type==='pendant'){b=`<path d="M40 30C50 90 80 110 100 110s50-20 60-80" fill="none" stroke="${f}" stroke-width="2.500"/><path d="M100 108c-24 14-34 32-20 52 8 11 28 11 40 0 14-20 4-38-20-52z" fill="${f}"/><path d="M100 128l-10 10 10 14 10-14z" fill="${gm}"/>`}
+  else if(type==='bracelet'){b=`<ellipse cx="100" cy="100" rx="66" ry="58" fill="none" stroke="${f}" stroke-width="9"/>${[...Array(12)].map((_,i)=>{const a=i/12*6.283;return`<circle cx="${100+66*Math.cos(a)}" cy="${100+58*Math.sin(a)}" r="7" fill="${i%3==0?gm:f}" stroke="${m[2]}" stroke-width="1"/>`}).join('')}`}
+  else if(type==='cuff'){b=`<path d="M40 70c0-24 120-24 120 0v10c0 24-120 24-120 0z" fill="${f}"/><path d="M40 70c0 24 120 24 120 0" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/><path d="M40 118c0-24 120-24 120 0v10c0 24-120 24-120 0z" fill="${f}" opacity=".85"/>`}
+  else if(type==='hoop'){b=`<g fill="none" stroke="${f}" stroke-width="9"><circle cx="64" cy="100" r="34"/><circle cx="136" cy="100" r="34"/></g><g fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.500"><circle cx="64" cy="100" r="30"/><circle cx="136" cy="100" r="30"/></g>`}
+  else if(type==='stud'){b=`<g><path d="M64 78l16 18-16 22-16-22z" fill="${gm}" stroke="${f}" stroke-width="5"/><path d="M136 78l16 18-16 22-16-22z" fill="${gm}" stroke="${f}" stroke-width="5"/><circle cx="64" cy="96" r="30" fill="none" stroke="${f}" stroke-width="3" opacity=".5"/><circle cx="136" cy="96" r="30" fill="none" stroke="${f}" stroke-width="3" opacity=".5"/></g>`}
+  else if(type==='set'){b=`<path d="M14 26C22 110 50 142 80 142s56-30 64-116" fill="none" stroke="${f}" stroke-width="9" stroke-dasharray="12 4" stroke-linecap="round"/><ellipse cx="146" cy="146" rx="38" ry="32" fill="none" stroke="${f}" stroke-width="9" stroke-dasharray="12 4" stroke-linecap="round"/><circle cx="80" cy="150" r="7" fill="${gm}" stroke="${m[2]}" stroke-width="1.5"/>`}
+  else if(type==='chain'){b=`<path d="M20 60Q100 190 180 60" fill="none" stroke="${f}" stroke-width="9" stroke-dasharray="14 5" stroke-linecap="round"/>`}
+  else {b=`<circle cx="100" cy="100" r="40" fill="${f}"/>`}
+  return`<svg viewBox="0 0 200 200" role="img" aria-hidden="true" focusable="false">${grad}${b}</svg>`;
+}
+
+/* ---------- catalog (defaults; owner edits are layered from db) ---------- */
+const CATS=[['rings','טבעות','ring','silver'],['necklaces','שרשראות ותליונים','pendant','gold'],['bracelets','צמידים','bracelet','rose'],['earrings','עגילים','hoop','gold'],['sets','סטים','set','silver']];
+const CAT_NAME=Object.fromEntries(CATS.map(c=>[c[0],c[1]]));
+let PRODUCTS=[
+ {id:'p01',cat:'rings',art:'ring',metal:'silver',gem:'#cfe8ff',title:'טבעת סוליטר כסף 925',mat:'כסף 925, זירקוניה',price:89,was:129,cost:21,tag:'sale',feat:3,desc:'טבעת קלאסית עם אבן זירקוניה מרכזית בליטוש חד. עיצוב נקי שמתאים ללבישה יומיומית.',sizes:['6','7','8','9','10']},
+ {id:'p02',cat:'rings',art:'band',metal:'gold',title:'טבעת בנד זהב מוברש',mat:'פלדת אל חלד בציפוי זהב PVD',price:69,was:0,cost:14,tag:'',feat:2,desc:'טבעת רחבה בגימור מוברש. פלדה שלא משחירה ועמידה במים.',sizes:['6','7','8','9','10','11']},
+ {id:'p03',cat:'rings',art:'band',metal:'black',title:'טבעת בלאק מט',mat:'פלדת אל חלד, גימור מט',price:59,was:79,cost:11,tag:'sale',feat:1,desc:'טבעת בגימור מט כהה, נוחה ואיכותית. מתאימה לכל סגנון.',sizes:['7','8','9','10','11','12']},
+ {id:'p04',cat:'necklaces',art:'pendant',metal:'gold',gem:'#ffe3a8',title:'שרשרת עם תליון טיפה',mat:'כסף 925 בציפוי זהב 18K',price:119,was:159,cost:29,tag:'sale',feat:3,desc:'שרשרת עדינה עם תליון בצורת טיפה. אורך מתכוונן 40 עד 45 ס״מ.',sizes:['40 ס״מ','45 ס״מ']},
+ {id:'p05',cat:'necklaces',art:'chain',metal:'silver',title:'שרשרת חוליות קלאסית',mat:'פלדת אל חלד',price:79,was:0,cost:16,tag:'',feat:2,desc:'שרשרת חוליות בעובי בינוני, נראית טוב לבד ובשכבות.',sizes:['45 ס״מ','50 ס״מ','55 ס״מ']},
+ {id:'p06',cat:'necklaces',art:'necklace',metal:'rose',gem:'#ffd6e0',title:'שרשרת עיגול רוז גולד',mat:'כסף 925 בציפוי רוז גולד',price:99,was:0,cost:24,tag:'חדש',feat:2,desc:'שרשרת דקה עם תליון עגול קטן. קלה לשכבות.',sizes:['40 ס״מ','45 ס״מ']},
+ {id:'p07',cat:'bracelets',art:'bracelet',metal:'gold',gem:'#bfe9d6',title:'צמיד חרוזים זהב',mat:'פלדת אל חלד, אבני זירקוניה',price:84,was:109,cost:19,tag:'sale',feat:2,desc:'צמיד גמיש עם חרוזים ואבנים קטנות לסירוגין.',sizes:['17 ס״מ','19 ס״מ','21 ס״מ']},
+ {id:'p08',cat:'bracelets',art:'cuff',metal:'silver',title:'צמיד קאף כסוף',mat:'פלדת אל חלד',price:74,was:0,cost:17,tag:'',feat:1,desc:'צמיד פתוח ורחב בגימור מבריק. מידה אחת, מתכוונן קלות.',sizes:['מידה אחת']},
+ {id:'p09',cat:'bracelets',art:'chain',metal:'black',title:'צמיד שרשרת בלאק',mat:'פלדת אל חלד, ציפוי שחור',price:64,was:0,cost:13,tag:'חדש',feat:2,desc:'צמיד שרשרת בגוון כהה עם סגירה מאובטחת.',sizes:['19 ס״מ','21 ס״מ','23 ס״מ']},
+ {id:'p10',cat:'earrings',art:'hoop',metal:'gold',title:'עגילי חישוק זהב',mat:'כסף 925 בציפוי זהב',price:79,was:99,cost:18,tag:'sale',feat:3,desc:'חישוקים קלים בקוטר 25 מ״מ. נוחים לשימוש יומיומי.',sizes:['25 מ״מ']},
+ {id:'p11',cat:'earrings',art:'stud',metal:'silver',gem:'#e6f2ff',title:'עגילי צמד זירקוניה',mat:'כסף 925, זירקוניה',price:59,was:0,cost:12,tag:'',feat:2,desc:'עגילים צמודים בעיצוב קלאסי עם אבן מנצנצת.',sizes:['מידה אחת']},
+ {id:'p12',cat:'earrings',art:'hoop',metal:'silver',title:'עגילי חישוק כסף',mat:'כסף 925',price:69,was:0,cost:15,tag:'',feat:1,desc:'חישוקים מבריקים מכסף 925 אמיתי.',sizes:['20 מ״מ','30 מ״מ']},
+];
+const OVR={}; // db overrides by id
+function liveProducts(){return PRODUCTS.map(p=>Object.assign({},p,OVR[p.id]||{})).concat(Object.entries(OVR).filter(([id,o])=>!PRODUCTS.some(p=>p.id===id)&&o&&o.title).map(([id,o])=>Object.assign({id,cat:'rings',art:'ring',metal:'gold',sizes:[],feat:1,price:0,was:0,cost:0},o))).filter(p=>p.active!==false)}
+const byId=id=>liveProducts().find(p=>p.id===id);
+const isSale=p=>p.was&&p.was>p.price;
+const okSrc=v=>typeof v==='string'&&/^(\/_blob\/[a-f0-9]{32}|https:\/\/)/.test(v);
+function mediaOf(p){
+  if(Array.isArray(p.media)){const m=p.media.filter(x=>x&&okSrc(x.src)&&(x.t==='img'||x.t==='video')).slice(0,8);if(m.length)return m}
+  const m=[];if(okSrc(p.img))m.push({t:'img',src:p.img});
+  [p.video].concat(Array.isArray(p.videos)?p.videos:[]).filter(okSrc).forEach(v=>m.push({t:'video',src:v,poster:p.img||''}));
+  return m;
+}
+const firstVideo=p=>mediaOf(p).find(x=>x.t==='video');
+const reduceMotion=()=>document.body.classList.contains('a-still')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+let GAL=[];
+function showMedia(i){
+  const st=$('#galStage');if(!st||!GAL[i])return;const m=GAL[i];
+  $$('.gal-th').forEach((b,k)=>b.setAttribute('aria-pressed',String(k===i)));
+  if(m.t==='img'){st.innerHTML=`<img src="${esc(m.src)}" alt="">`;return}
+  const still=reduceMotion();
+  st.innerHTML=`<video src="${esc(m.src)}" ${okSrc(m.poster)?`poster="${esc(m.poster)}"`:''} muted loop playsinline ${still?'controls':'autoplay'} preload="auto" aria-label="סרטון מוצר"></video>${still?'':'<button class="vtoggle" data-vt aria-label="השהיית הסרטון">❚❚</button>'}`;
+  const v=$('video',st);if(!still&&v){v.muted=true;const pr=v.play();pr&&pr.catch(()=>{})}
+}
+function bindHover(root){
+  if(!root||!(window.matchMedia&&matchMedia('(hover:hover)').matches))return;
+  $$('.card',root).forEach(card=>{const v=$('video.hov',card);if(!v)return;
+    card.addEventListener('mouseenter',()=>{if(reduceMotion())return;if(!v.getAttribute('src'))v.src=v.dataset.src;v.muted=true;v.classList.add('on');const pr=v.play();pr&&pr.catch(()=>{})});
+    card.addEventListener('mouseleave',()=>{v.classList.remove('on');v.pause()})});
+}
+function picHtml(p){const im=mediaOf(p).find(x=>x.t==='img');if(im)return `<img src="${esc(im.src)}" alt="${esc(p.title)}" loading="lazy">`;return p.img?`<img src="${esc(p.img)}" alt="${esc(p.title)}" loading="lazy">`:art(p.art,p.metal,p.gem)}
+
+/* ---------- coupons ---------- */
+let COUPONS={LIETO10:{type:'pct',v:10,label:'10% הנחה בהזמנה ראשונה'},PAIR15:{type:'pair',v:15,min:2,label:'15% בקניית 2 פריטים ומעלה'},STACK20:{type:'pair',v:20,min:3,label:'20% בקניית 3 פריטים ומעלה'}};
+const state={cat:'all',q:'',sort:'feat',cart:LS.get('lieto_cart',[]),wish:LS.get('lieto_wish',[]),recent:LS.get('lieto_recent',[]),coupon:LS.get('lieto_coupon','')};
+const saveCart=()=>{LS.set('lieto_cart',state.cart);LS.set('lieto_coupon',state.coupon)};
+
+/* ---------- db ---------- */
+let DB=null, IS_ADMIN=false, USER=null, DBREADY=false;
+const pending=LS.get('lieto_pending_orders',[]);
+let MYID=null,EVQ=[],evT=null,evBusy=false;
+async function pushOrder(o){const ref=DB.doc('orders/'+MYID);const s=await ref.get();const list=(s.exists&&Array.isArray(s.data().list))?s.data().list:[];list.push(o);await ref.set({list:list.slice(-200)})}
+function track(type,data){ if(!DB||!MYID)return; EVQ.push(Object.assign({type,t:Date.now()},data||{})); clearTimeout(evT); evT=setTimeout(flushEv,4000) }
+async function flushEv(){ if(evBusy||!EVQ.length)return; evBusy=true; const add=EVQ.splice(0); try{const ref=DB.doc('events/'+MYID);const s=await ref.get();const list=(s.exists&&Array.isArray(s.data().list))?s.data().list:[];await ref.set({list:list.concat(add).slice(-400)})}catch(e){} evBusy=false; if(EVQ.length)evT=setTimeout(flushEv,4000) }
+
+/* ---------- render storefront ---------- */
+function renderHero(){
+  const lp=liveProducts(), main=(STORE.heroId&&byId(STORE.heroId))||byId('p01')||lp[0];
+  if(main){
+    const hi=okSrc(main.heroImg)?{src:main.heroImg,wide:true}:mediaOf(main).find(x=>x.t==='img');
+    const pr=heroPromo(),sale=isSale(main);
+    const after=pr?Math.round(main.price*(100-pr.v))/100:0;
+    const badge='';
+    const daysLeft=pr&&pr.until?Math.max(0,Math.ceil((untilTs(pr)-Date.now())/864e5)):0;
+    const priceRow=pr?`<b>${money(after)}</b><s class="hcap-reg">${money(main.price)}</s><em>חוסכים ${money(main.price-after)}</em>`
+      :`<b>${money(main.price)}</b>${sale?`<s>${money(main.was)}</s><em>חוסכים ${money(main.was-main.price)}</em>`:''}`;
+    $('#heroFig').innerHTML=`<button class="stage${hi?' photo':''}${hi&&hi.wide?' wide':''}" data-open="${main.id}" ${pr?`data-promo="${esc(pr.code)}"`:''} aria-label="לצפייה: ${esc(main.title)}">${hi?`<img src="${esc(hi.src)}" alt="${esc(main.title)}">`:art(main.art,'gold','#d8ecff')}${badge}${pr?`<span class="hflag"><i>${esc(pr.label||'מבצע')}</i><b>${pr.v}% על כל ההזמנה</b></span>`:''}</button>
+    <figcaption class="hcap"><div class="hcap-t"><span class="hcap-n">${esc(main.title)}</span><span class="hcap-p">${priceRow}</span>${pr?`<small class="hcap-terms">${daysLeft?`<b class="hcap-left">נשארו ${daysLeft===1?'יום אחד':daysLeft+' ימים'} למבצע</b> · `:''}הקוד <span dir="ltr">${esc(pr.code)}</span> נכנס לעגלה אוטומטית · ${esc(pr.v)}% על כל ההזמנה · <button class="lnk" data-doc="promos">תנאים</button></small>`:''}</div><button class="btn btn-ink btn-sm" data-open="${main.id}" ${pr?`data-promo="${esc(pr.code)}"`:''}>${pr?`קנו עכשיו ב-${money(after)}`:'קנו עכשיו'}</button></figcaption>`;
+  }
+  const picks=lp.filter(p=>main&&p.id!==main.id).sort((a,b)=>(b.feat||0)-(a.feat||0)).slice(0,3);
+  $('#heroPicks').innerHTML=picks.map(p=>`<button class="pick" data-open="${p.id}"><span class="th">${picHtml(p)}</span><span><span>${esc(p.title)}</span><b>${money(p.price)}</b></span></button>`).join('');
+}
+const ANN=[()=>`משלוח חינם בהזמנה מעל <b>${money(STORE.freeShipFrom)}</b>`,()=>'10% הנחה בהזמנה הראשונה עם הקוד <b>LIETO10</b>',()=>'14 יום להחזרה · מספר מעקב לכל הזמנה'];let annI=0;
+setInterval(()=>{const t=$('#annTxt');if(!t||document.body.classList.contains('a-still'))return;t.style.opacity=0;setTimeout(()=>{annI=(annI+1)%ANN.length;t.innerHTML=ANN[annI]();t.style.opacity=1},350)},5000);
+function renderCats(){
+  $('#cats').innerHTML=CATS.map(c=>{const n=liveProducts().filter(p=>p.cat===c[0]).length;return`<button class="cat" data-cat="${c[0]}"><span aria-hidden="true">${art(c[2],c[3])}</span><b>${esc(c[1])}</b><small>${n===1?'פריט אחד':n+' פריטים'}</small></button>`}).join('');
+  $('#chips').innerHTML=[['all','הכל']].concat(CATS.map(c=>[c[0],c[1]])).map(([k,n])=>`<button class="chip" data-chip="${k}" aria-pressed="${state.cat===k}">${esc(n)}</button>`).join('');
+}
+function cardHtml(p){
+  const w=state.wish.includes(p.id);
+  return`<article class="card"><div style="position:relative"><button class="pic" data-open="${p.id}" aria-label="פרטים על ${esc(p.title)}">${picHtml(p)}${(()=>{const fv=firstVideo(p);return fv?`<video class="hov" data-src="${esc(fv.src)}" muted loop playsinline preload="none" aria-hidden="true"></video><span class="vbadge">▶ וידאו</span>`:''})()}${isSale(p)?`<span class="tag sale">${Math.round((1-p.price/p.was)*100)}%-</span>`:(p.tag?`<span class="tag">${esc(p.tag)}</span>`:'')}</button><button class="wish" data-wish="${p.id}" aria-pressed="${w}" aria-label="${w?'הסר מהמועדפים':'הוסף למועדפים'}: ${esc(p.title)}"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-10a4 4 0 017-2.600A4 4 0 0119 10c0 5.600-7 10-7 10z"/></svg></button></div>
+  <div class="cbody"><h3>${esc(p.title)}</h3><div class="mat">${esc(p.mat||'')}</div><div class="price"><b>${money(p.price)}</b>${isSale(p)?`<s>${money(p.was)}</s>`:''}</div><button class="btn btn-ink" data-quick="${p.id}">הוספה לעגלה</button></div></article>`}
+function renderGrid(){
+  let l=liveProducts().filter(p=>(state.cat==='all'||p.cat===state.cat)&&(!state.q||(p.title+' '+(p.mat||'')).toLowerCase().includes(state.q.toLowerCase())));
+  const s=state.sort;
+  l.sort((a,b)=>s==='pa'?a.price-b.price:s==='pd'?b.price-a.price:s==='sale'?((b.was?1-b.price/b.was:0)-(a.was?1-a.price/a.was:0)):(b.feat||0)-(a.feat||0));
+  $('#grid').innerHTML=l.length?l.map(cardHtml).join(''):'<div class="empty" style="grid-column:1/-1">לא נמצאו מוצרים. נסו חיפוש אחר או קטגוריה אחרת.</div>';
+  const r=state.recent.map(byId).filter(Boolean).slice(0,4);
+  $('#recentWrap').hidden=!r.length;$('#recent').innerHTML=r.map(cardHtml).join('');bindHover($('#grid'));bindHover($('#recent'));
+}
+function renderLookbook(){const sec=$('#lookbook');if(!sec)return;const l=STORE.lookbook||[];sec.hidden=!l.length;$('#lbGrid').innerHTML=l.map(x=>`<button class="lb-item" ${x.pid&&byId(x.pid)?`data-open="${esc(x.pid)}"`:''} aria-label="${esc(x.cap)}"><img src="${esc(x.src)}" alt="" loading="lazy"><span class="lb-cap">${esc(x.cap)}</span></button>`).join('')}
+const VH_SCENES=[
+  {end:3.7,k:'קולקציית 316L החדשה',h:'נוכחות שמדברת<br>עוד לפני המילה הראשונה.',s:'פלדת אל-חלד 316L · גימור מטאלי עמיד במים'},
+  {end:7.7,k:'שכבות שיושבות מדויק',h:'הפרט הקטן<br>שמשנה את כל הלוק.',s:'יומיום וערב · ללא השחרה וללא פשרות'},
+  {end:99,k:'בונה הסטים של LIETO',h:'בנה את הסט שלך.',s:'15% הנחה על 2 פריטים · 20% על 3 פריטים'}];
+const vhMQ=window.matchMedia?matchMedia('(max-width:760px)'):null;
+let vhScene=-1;
+function vhCaption(i){
+  const c=$('#vhCap');if(!c||i===vhScene)return;vhScene=i;const sc=VH_SCENES[i];
+  c.classList.add('swap');
+  setTimeout(()=>{c.querySelector('.vh-k').textContent=sc.k;c.querySelector('.vh-h').innerHTML=sc.h;c.querySelector('.vh-s').textContent=sc.s;c.querySelector('.vh-cta').hidden=i!==2;c.classList.remove('swap')},vhScene===-1?0:260);
+}
+function renderVHero(){
+  const sec=$('#vhero'),v=$('#vhVideo');if(!sec||!v)return;
+  const mobile=!!(vhMQ&&vhMQ.matches&&STORE.heroVideoMobile);
+  const src=mobile?STORE.heroVideoMobile:(okSrc(STORE.heroVideo)?STORE.heroVideo:'');
+  sec.hidden=!src;sec.classList.toggle('vh-mobile',mobile);document.body.classList.toggle('has-vhero',!!src);if(!src)return;
+  if(v.getAttribute('src')!==src){const po=mobile?STORE.heroPosterMobile:STORE.heroPoster;if(okSrc(po))v.poster=po;v.src=src;vhScene=-1}
+  if(mobile&&vhScene===-1)vhCaption(0);
+  const still=reduceMotion(),tb=$('#vhToggle');
+  if(still){v.pause();tb.textContent='▶';tb.setAttribute('aria-label','הפעלת הסרטון')}
+  else if(v.paused&&!v.dataset.userPaused){v.muted=true;const pr=v.play();pr&&pr.catch(()=>{})}
+}
+(function(){const v=$('#vhVideo');if(v)v.addEventListener('timeupdate',()=>{if(!$('#vhero').classList.contains('vh-mobile'))return;const t=v.currentTime;vhCaption(VH_SCENES.findIndex(x=>t<x.end))});
+  if(vhMQ){const f=()=>renderVHero();vhMQ.addEventListener?vhMQ.addEventListener('change',f):vhMQ.addListener(f)}})();
+function renderAll(){renderVHero();renderHero();renderLookbook();renderCats();renderGrid();renderCart();renderWish();badges()}
+function badges(){const n=state.cart.reduce((a,l)=>a+l.q,0);$('#cartN').hidden=!n;$('#cartN').textContent=n;$('#wishN').hidden=!state.wish.length;$('#wishN').textContent=state.wish.length}
+
+/* ---------- cart math ---------- */
+const untilTs=c=>c&&c.until?new Date(c.until+'T23:59:59').getTime():0;
+function couponLive(code){const c=COUPONS[code];if(!c)return false;const u=untilTs(c);return !u||Date.now()<=u}
+const dmy=iso=>{const [y,m,d]=String(iso).split('-');return d&&m&&y?`${+d}.${+m}.${y}`:''};
+function heroPromo(){const code=STORE.heroCoupon;if(!code||!couponLive(code))return null;const c=COUPONS[code];if(!c||c.type!=='pct')return null;return Object.assign({code},c)}
+function totals(){
+  const lines=state.cart.map(l=>{const p=byId(l.id);return p?Object.assign({},l,{p}):null}).filter(Boolean);
+  const sub=lines.reduce((a,l)=>a+l.p.price*l.q,0), qty=lines.reduce((a,l)=>a+l.q,0);
+  let disc=0,note='';const c=couponLive(state.coupon)?COUPONS[state.coupon]:null;if(state.coupon&&COUPONS[state.coupon]&&!c)note='תוקף הקוד הסתיים';
+  if(c){ if(c.type==='pct'&&!LS.get('lieto_used_'+state.coupon,false)){disc=sub*c.v/100}
+    else if(c.type==='pair'&&qty>=(c.min||2)){disc=sub*c.v/100}
+    else if(c.type==='fixed'){disc=Math.min(c.v,sub)}
+    else if(c.type==='pct'){note='הקוד כבר נוצל במכשיר הזה'}
+    else note='הקוד דורש לפחות '+(c.min||2)+' פריטים' }
+  let dlabel=disc?'הנחה ('+state.coupon+')':'',dcode=disc?state.coupon:'';
+  const tier=qty>=3?20:qty>=2?15:0,auto=sub*tier/100;
+  if(auto>disc){disc=auto;dlabel='הנחת סט ('+tier+'%)';dcode=tier===20?'STACK20':'PAIR15';note=''}
+  disc=Math.round(disc*100)/100;
+  const after=sub-disc, ship=(!lines.length||after>=STORE.freeShipFrom)?0:STORE.shipFee;
+  return{lines,sub,qty,disc,dlabel,dcode,note,ship,total:Math.max(0,after+ship),after};
+}
+function addToCart(id,size){
+  const p=byId(id);if(!p)return;const sz=size||(p.sizes&&p.sizes.length===1?p.sizes[0]:(p.sizes&&p.sizes[0])||'');
+  const f=state.cart.find(l=>l.id===id&&l.size===sz);if(f)f.q=Math.min(9,f.q+1);else state.cart.push({id,size:sz,q:1});
+  saveCart();renderCart();badges();toast('✓ '+p.title+' בעגלה');track('add_to_cart',{pid:id});
+}
+function renderCart(){
+  const t=totals(),b=$('#cartBody'),f=$('#cartFoot');
+  if(!t.lines.length){b.innerHTML='<div class="empty">העגלה ריקה. הוסיפו תכשיט מהקולקציה.</div>';f.innerHTML='';return}
+  const left=Math.max(0,STORE.freeShipFrom-t.after),pc=Math.min(100,t.after/STORE.freeShipFrom*100);
+  const nudge=t.qty===1?'<div class="tier-nudge">עוד פריט אחד ו-<b>15% הנחה</b> על הכל</div>':t.qty===2?'<div class="tier-nudge">עוד פריט אחד ו-<b>20% הנחה</b> על הכל</div>':'';
+  b.innerHTML=nudge+`<div class="ship-bar">${left>0?`הוסיפו עוד <b>${money(left)}</b> למשלוח חינם`:'<b>משלוח חינם</b> בהזמנה הזו'}<div class="meter"><i style="width:${pc}%"></i></div></div>`+
+   t.lines.map((l,i)=>`<div class="line"><div class="th">${picHtml(l.p)}</div><div><b style="font-size:.95rem">${esc(l.p.title)}</b><div style="font-size:.82rem;color:var(--muted)">${l.size?'מידה: '+esc(l.size):''}</div><div style="margin-top:6px;display:flex;gap:12px;align-items:center"><span class="qty"><button data-dec="${i}" aria-label="הפחת כמות">−</button><span>${l.q}</span><button data-inc="${i}" aria-label="הוסף כמות">+</button></span><button class="rm" data-rm="${i}">הסרה</button></div></div><b class="n" style="font-variant-numeric:tabular-nums">${money(l.p.price*l.q)}</b></div>`).join('')+
+   upsell(t);
+  f.innerHTML=`<div style="display:flex;gap:8px"><label class="sr" for="cpn">קוד קופון</label><input class="field grow" id="cpn" placeholder="קוד קופון" value="${esc(state.coupon)}" style="direction:ltr;text-align:end"><button class="btn btn-line btn-sm" id="cpnBtn">החל</button></div>${t.note?`<div class="err">${esc(t.note)}</div>`:''}
+   <div class="sum"><span>סכום ביניים</span><span>${money(t.sub)}</span></div>
+   ${t.disc?`<div class="sum" style="color:var(--ok)"><span>${esc(t.dlabel)}</span><span>−${money(t.disc)}</span></div>`:''}
+   <div class="sum"><span>משלוח</span><span>${t.ship?money(t.ship):'חינם'}</span></div>
+   <div class="sum tot"><span>סה״כ</span><span>${money(t.total)}</span></div>
+   <button class="btn btn-ink" style="justify-content:center" id="goCo">מעבר לתשלום</button>`;
+}
+function upsell(t){
+  const inCart=new Set(t.lines.map(l=>l.id));const cats=new Set(t.lines.map(l=>l.p.cat));
+  const sug=liveProducts().filter(p=>!inCart.has(p.id)&&!cats.has(p.cat)).sort((a,b)=>(b.feat||0)-(a.feat||0)).slice(0,2);
+  if(!sug.length)return'';
+  return`<div style="margin-top:18px"><b style="font-family:var(--font-display);font-size:1.1rem">משלימים את הלוק</b>${sug.map(p=>`<div class="line" style="grid-template-columns:56px 1fr auto;align-items:center"><div class="th" style="width:56px;height:56px">${picHtml(p)}</div><div style="font-size:.88rem"><b>${esc(p.title)}</b><div>${money(p.price)}</div></div><button class="btn btn-line btn-sm" data-quick="${p.id}">הוספה</button></div>`).join('')}</div>`;
+}
+function renderWish(){
+  const l=state.wish.map(byId).filter(Boolean);
+  $('#wishBody').innerHTML=l.length?l.map(p=>`<div class="line"><div class="th">${picHtml(p)}</div><div><b style="font-size:.95rem">${esc(p.title)}</b><div>${money(p.price)}</div><div style="margin-top:6px;display:flex;gap:10px"><button class="btn btn-ink btn-sm" data-quick="${p.id}">לעגלה</button><button class="rm" data-wish="${p.id}">הסרה</button></div></div><span></span></div>`).join(''):'<div class="empty">עדיין לא שמרתם מוצרים. לחצו על הלב בכל מוצר.</div>';
+}
+
+/* ---------- product modal ---------- */
+function openProduct(id){
+  const p=byId(id);if(!p)return;
+  state.recent=[id].concat(state.recent.filter(x=>x!==id)).slice(0,8);LS.set('lieto_recent',state.recent);track('view',{pid:id});
+  let size=(p.sizes&&p.sizes[0])||'';const fins=Array.isArray(p.finishes)?p.finishes.filter(x=>typeof x==='string').slice(0,6):[];let fin=fins[0]||'';GAL=mediaOf(p);
+  const rel=liveProducts().filter(x=>x.cat===p.cat&&x.id!==id).slice(0,3);
+  $('#pmSheet').innerHTML=`<button class="x" data-mclose aria-label="סגור">✕</button><div class="pd"><div class="gal"><div class="gal-stage" id="galStage">${GAL.length?'':art(p.art,p.metal,p.gem)}</div>${GAL.length>1?`<div class="gal-thumbs">${GAL.map((x,i)=>`<button class="gal-th" data-gi="${i}" aria-pressed="${i===0}" aria-label="${x.t==='video'?'סרטון':'תמונה'} ${i+1}">${x.t==='video'&&!okSrc(x.poster)?'<span class="noposter"></span>':`<img src="${esc(x.t==='video'?x.poster:x.src)}" alt="" loading="lazy">`}${x.t==='video'?'<span class="play" aria-hidden="true">▶</span>':''}</button>`).join('')}</div>`:''}</div><div class="pd-i">
+   <div class="eyebrow" style="color:var(--gold)">${esc(CAT_NAME[p.cat]||'')}</div><h2>${esc(p.title)}</h2>
+   <div class="price"><b style="font-size:1.6rem">${money(p.price)}</b>${isSale(p)?`<s>${money(p.was)}</s>`:''}</div>
+   <p style="margin:0;color:var(--muted)">${esc(p.desc||'')}</p>
+   ${p.sizes&&p.sizes.length>1?`<div><div style="font-size:.86rem;color:var(--muted);margin-bottom:6px">מידה</div><div class="opts" id="opts">${p.sizes.map((s,i)=>`<button class="opt" data-sz="${esc(s)}" aria-pressed="${i===0}">${esc(s)}</button>`).join('')}</div></div>`:''}
+   ${fins.length>1?`<div><div style="font-size:.86rem;color:var(--muted);margin-bottom:6px">גימור</div><div class="opts" id="fopts">${fins.map((f,i)=>`<button class="opt" data-fin="${esc(f)}" aria-pressed="${i===0}">${esc(f)}</button>`).join('')}</div></div>`:''}
+   <dl class="spec"><dt>חומר</dt><dd>${esc(p.mat||'')}</dd><dt>אספקה</dt><dd>10 עד 25 ימי עסקים, עם מספר מעקב</dd><dt>החזרה</dt><dd>14 יום לפי התקנון</dd></dl>
+   <button class="btn btn-ink" style="justify-content:center" id="pmAdd">הוספה לעגלה</button>
+   <button class="btn btn-line" style="justify-content:center" data-wish="${p.id}">${state.wish.includes(p.id)?'הסרה מהמועדפים':'שמירה במועדפים'}</button>
+   ${rel.length?`<div style="margin-top:8px"><b style="font-family:var(--font-display)">עוד מהקטגוריה</b><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">${rel.map(r=>`<button class="btn btn-line btn-sm" data-open="${r.id}">${esc(r.title)}</button>`).join('')}</div></div>`:''}
+  </div></div>`;
+  openModal('pm');if(GAL.length)showMedia(0);
+  $('#pmAdd').onclick=()=>{addToCart(id,[size,fins.length>1?fin:''].filter(Boolean).join(' · '));closeAll();openDrawer('cart')};
+  $$('#fopts .opt').forEach(o=>o.onclick=()=>{fin=o.dataset.fin;$$('#fopts .opt').forEach(x=>x.setAttribute('aria-pressed',String(x===o)))});
+  $$('#opts .opt').forEach(o=>o.onclick=()=>{size=o.dataset.sz;$$('#opts .opt').forEach(x=>x.setAttribute('aria-pressed',String(x===o)))});
+  renderGrid();
+}
+
+/* ---------- overlay plumbing ---------- */
+let lastFocus=null;
+function openModal(id){lastFocus=document.activeElement;closeDrawers();$('#'+id).classList.add('on');$('#scrim').classList.add('on');document.body.style.overflow='hidden';const x=$('#'+id+' [data-mclose]');x&&x.focus()}
+function openDrawer(id){lastFocus=document.activeElement;closeModals();closeDrawers();$('#'+id).classList.add('on');$('#'+id).setAttribute('aria-hidden','false');$('#scrim').classList.add('on');document.body.style.overflow='hidden';const x=$('#'+id+' [data-close]');x&&x.focus()}
+function closeDrawers(){$$('.drawer').forEach(d=>{d.classList.remove('on');d.setAttribute('aria-hidden','true')})}
+function closeModals(){$$('.modal').forEach(m=>m.classList.remove('on'));$$('#galStage video').forEach(v=>v.pause())}
+function closeAll(){closeDrawers();closeModals();$('#mnav').classList.remove('on');$('#scrim').classList.remove('on');document.body.style.overflow='';if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}}
+
+/* ---------- legal documents ---------- */
+const LAW_NOTE='<div class="note">נוסח תבנית בלבד, מותאם להוראות הדין בישראל ככל הידוע. לפני פתיחת החנות לציבור יש להשלים את פרטי העסק ולהעביר את המסמכים לבדיקה של עורך דין.</div>';
+const DOCS={
+ terms:()=>`<h2>תקנון האתר</h2>${LAW_NOTE}
+ <h3>1. כללי</h3><p>האתר ${esc(STORE.name)} ("האתר") מופעל על ידי ${esc(STORE.business)}, ${esc(STORE.address)} ("העסק"). השימוש באתר ורכישה בו מהווים הסכמה לתנאי תקנון זה. הפנייה בלשון זכר נעשית מטעמי נוחות בלבד ומתייחסת לכל המינים.</p>
+ <h3>2. המוצרים והמחירים</h3><p>המוצרים מוצגים בתמונות להמחשה בלבד, וייתכנו הבדלי גוון ומידה קלים. המחירים בשקלים חדשים וכוללים מע״מ. העסק רשאי לעדכן מחירים ומבצעים בכל עת, ושינוי לא יחול על הזמנה שאושרה. במקרה של טעות מחיר מובהקת רשאי העסק לבטל את ההזמנה ולהשיב את התשלום במלואו.</p>
+ <h3>3. מודל ההפצה והאספקה</h3><p>המוצרים נשלחים ללקוח ישירות מספק צד שלישי. לפיכך זמן האספקה המשוער הוא 10 עד 25 ימי עסקים מאישור ההזמנה, ועשוי להשתנות בשל חגים, מכס או עיכובי דואר. לכל הזמנה יימסר מספר מעקב כשהמשלוח יוצא.</p>
+ <h3>4. הזמנה ותשלום</h3><p>ההזמנה מאושרת רק לאחר קבלת אישור חיוב מחברת האשראי ושליחת אישור במייל. פרטי כרטיס האשראי מועברים לספק סליקה מורשה ואינם נשמרים באתר.</p>
+ <h3>5. ביטול וזכות החזרה</h3><p>ביטול עסקה וההחזרים כפופים לחוק הגנת הצרכן, התשמ״א-1981 ולתקנות הגנת הצרכן (ביטול עסקה), התשע״א-2010, ולמדיניות <a href="#" data-doc="returns">החזרות וביטולים</a>.</p>
+ <h3>5א. מבצעים והנחות</h3><p>מחיר מחוק מוצג רק כאשר המוצר נמכר בפועל במחיר זה באתר לפני תחילת ההנחה. תנאי כל מבצע וקוד הנחה, לרבות מועד סיומו, מפורטים ב<a href="#" data-doc="promos">תנאי המבצעים</a>.</p>
+ <h3>6. קניין רוחני</h3><p>כל התכנים באתר, לרבות הלוגו, העיצוב והטקסטים, שייכים לעסק או לצדדים שהתירו את השימוש בהם. אין להעתיק או להפיץ ללא אישור בכתב.</p>
+ <h3>7. הגבלת אחריות</h3><p>העסק יפעל לתפקוד תקין של האתר אך אינו מתחייב שהאתר יהיה נקי משגיאות או זמין ללא הפסקה. אין באמור כדי לפגוע בזכויות שאינן ניתנות להתנאה לפי דין.</p>
+ <h3>8. דין וסמכות שיפוט</h3><p>על האתר ועל התקנון יחול הדין הישראלי. סמכות השיפוט הבלעדית נתונה לבתי המשפט המוסמכים במחוז ${esc(STORE.address)}.</p>
+ <h3>9. יצירת קשר</h3><p>דוא״ל: ${esc(STORE.email)} · טלפון: ${esc(STORE.phone)}</p>`,
+ privacy:()=>`<h2>מדיניות פרטיות</h2>${LAW_NOTE}
+ <h3>איזה מידע נאסף</h3><p>בעת הזמנה אנו אוספים שם, כתובת למשלוח, טלפון ואימייל. באתר נאסף גם מידע שימוש בסיסי כגון צפייה במוצרים והוספה לעגלה, לצורך שיפור השירות.</p>
+ <h3>למה משתמשים במידע</h3><p>לביצוע ההזמנה ומשלוחה, לשירות לקוחות, ולשליחת דיוור שיווקי רק למי שהסכים לכך במפורש. אפשר לבטל הסכמה בכל עת.</p>
+ <h3>העברה לצדדים שלישיים</h3><p>לצורך המשלוח נמסרים לספק ולחברת השילוח שם, כתובת וטלפון של המקבל. פרטי התשלום מועברים לספק הסליקה בלבד.</p>
+ <h3>אבטחה</h3><p>אנו נוקטים אמצעים סבירים להגנה על המידע, אך אין מערכת חסינה לחלוטין.</p>
+ <h3>הזכויות שלכם</h3><p>לפי חוק הגנת הפרטיות, התשמ״א-1981, אתם רשאים לעיין במידע עליכם, לבקש תיקון או מחיקה. פנו אלינו: ${esc(STORE.email)}.</p>
+ <h3>עוגיות ואחסון מקומי</h3><p>האתר שומר בדפדפן עגלה, מועדפים והעדפות נגישות.</p>`,
+ shipping:()=>`<h2>מדיניות משלוחים</h2>${LAW_NOTE}
+ <h3>זמני אספקה</h3><p>${STORE.shipMin} עד ${STORE.shipMax} ימי עסקים מאישור ההזמנה. המשלוח יוצא ישירות מהספק, לכן ההזמנה אינה מגיעה מחבילה אחת מרוכזת אם הזמנתם כמה מוצרים.</p>
+ <h3>עלות</h3><p>${money(STORE.shipFee)} למשלוח, וחינם בהזמנה מעל ${money(STORE.freeShipFrom)} (לאחר הנחות).</p>
+ <h3>מעקב</h3><p>מספר מעקב יישלח למייל מיד לאחר יציאת המשלוח.</p>
+ <h3>מכס</h3><p>חיוב מכס או מס, ככל שיחול לפי חוק, יוצג בהתאם להוראות הרשויות.</p>`,
+ returns:()=>`<h2>החזרות וביטולים</h2>${LAW_NOTE}
+ <h3>ביטול עסקה</h3><p>ניתן לבטל עסקה בהודעה בכתב תוך 14 ימים מיום קבלת המוצר או מיום קבלת מסמך הגילוי, המאוחר מביניהם, ועד 4 ימי עסקים לאחר יום הקבלה כאמור בחוק. דמי ביטול לא יעלו על 5% ממחיר העסקה או 100 ש״ח, הנמוך מביניהם.</p>
+ <h3>תנאי החזרה</h3><p>יש להחזיר את המוצר באריזתו המקורית, ללא סימני שימוש. תכשיט שנענד ונפגע לא יוחזר. החזר כספי יינתן בתוך 14 ימים מהודעת הביטול לאמצעי התשלום המקורי.</p>
+ <h3>מוצר פגום או שגוי</h3><p>במקרה של פגם או מוצר שגוי, פנו אלינו תוך 14 ימים עם תמונה ופרטי הזמנה, ונטפל בהחלפה או בזיכוי ללא עלות.</p>`,
+ promos:()=>{const act=Object.entries(COUPONS).filter(([k])=>couponLive(k));return`<h2>תנאי מבצעים וקופונים</h2>
+ <ul>${act.map(([k,c])=>`<li><b dir="ltr">${esc(k)}</b>: ${esc(c.label||'')}${c.type==='pct'?` (${c.v}% מסכום המוצרים בעגלה)`:''}${c.until?`. בתוקף עד ${dmy(c.until)} בשעה 23:59`:'. בתוקף עד להודעה חדשה'}.</li>`).join('')}</ul>
+ <h3>תנאים כלליים</h3><ul><li>ניתן להשתמש בקוד אחד בלבד בכל הזמנה, ואין כפל מבצעים.</li><li>ההנחה מחושבת ממחיר המכירה הרגיל המופיע באתר, ואינה חלה על דמי משלוח.</li><li>קוד הנחה להזמנה ראשונה מיועד ללקוח חדש ולשימוש חד פעמי.</li><li>ביטול עסקה שנעשתה במבצע יזכה בסכום ששולם בפועל.</li><li>המבצע בתוקף עד המועד המצוין או עד לסיום המלאי, המוקדם מביניהם. סיום מוקדם בגלל מלאי יפורסם באתר.</li></ul>${LAW_NOTE}`},
+ contact:()=>`<h2>יצירת קשר</h2><p>נשמח לעזור בכל שאלה על הזמנה, מידות או משלוח.</p><p>דוא״ל: ${esc(STORE.email)}<br>טלפון: ${esc(STORE.phone)}<br>שעות מענה: ימים א׳ עד ה׳, 9:00 עד 17:00</p>${LAW_NOTE}`,
+ a11y:()=>`<h2>הצהרת נגישות</h2>
+ <p>${esc(STORE.name)} רואה חשיבות בהנגשת האתר לכלל המשתמשים, כולל אנשים עם מוגבלות, בהתאם לתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע״ג-2013, ולתקן הישראלי ת״י 5568 המבוסס על WCAG 2.1 ברמה AA.</p>
+ <h3>התאמות שבוצעו</h3><ul><li>ניווט מלא במקלדת, קישור "דלג לתוכן", וסימון פוקוס ברור.</li><li>מבנה כותרות סמנטי ותוויות לקוראי מסך.</li><li>כפתור נגישות עם הגדלת טקסט, ניגודיות, עצירת אנימציות, גופן קריא, ריווח ועוד.</li><li>תמיכה בהעדפת "הפחתת תנועה" של מערכת ההפעלה ובמצב כהה.</li><li>התאמה לטלפון נייד, לטאבלט ולמחשב.</li></ul>
+ <h3>מגבלות ידועות</h3><p>ייתכן שחלק מהתכנים שהוטמעו על ידי צדדים שלישיים אינם נגישים במלואם. אנו ממשיכים לבדוק ולשפר.</p>
+ <h3>פניות נגישות</h3><p>נתקלתם בקושי? פנו לרכז הנגישות: ${esc(STORE.email)}, ${esc(STORE.phone)}. נשתדל להשיב תוך 5 ימי עסקים.</p>${LAW_NOTE}`
+};
+function openDoc(k){const f=DOCS[k];if(!f)return;$('#dmSheet').innerHTML=`<button class="x" data-mclose aria-label="סגור">✕</button><div class="doc">${f()}</div>`;openModal('dm')}
+
+/* ---------- checkout ---------- */
+function openCheckout(){
+  const t=totals();if(!t.lines.length)return;
+  track('begin_checkout',{total:t.total});
+  const saved=LS.get('lieto_cust',{});
+  $('#cmSheet').innerHTML=`<button class="x" data-mclose aria-label="סגור">✕</button><div class="pd" style="grid-template-columns:1.2fr .8fr"><form class="co pd-i" id="coForm" novalidate>
+   <h2>פרטי משלוח ותשלום</h2>
+   <div class="row2"><label class="l">שם מלא<input class="field" id="cName" autocomplete="name" required value="${esc(saved.name||'')}"></label><label class="l">טלפון<input class="field" id="cPhone" type="tel" autocomplete="tel" inputmode="tel" required value="${esc(saved.phone||'')}" style="direction:ltr;text-align:end"></label></div>
+   <label class="l">אימייל<input class="field" id="cMail" type="email" autocomplete="email" required value="${esc(saved.email||'')}" style="direction:ltr;text-align:end"></label>
+   <div class="row2"><label class="l">עיר<input class="field" id="cCity" autocomplete="address-level2" required value="${esc(saved.city||'')}"></label><label class="l">מיקוד<input class="field" id="cZip" autocomplete="postal-code" inputmode="numeric" value="${esc(saved.zip||'')}"></label></div>
+   <label class="l">רחוב ומספר בית / דירה<input class="field" id="cAddr" autocomplete="street-address" required value="${esc(saved.addr||'')}"></label>
+   <label class="l">הערות למשלוח (לא חובה)<textarea class="field" id="cNote" rows="2" maxlength="300"></textarea></label>
+   <label class="chk"><input type="checkbox" id="cTerms"><span>קראתי ואני מסכים/ה ל<a href="#" data-doc="terms">תקנון האתר</a>, ל<a href="#" data-doc="returns">מדיניות ההחזרות</a> ול<a href="#" data-doc="privacy">מדיניות הפרטיות</a>, ומבין/ה שזמן האספקה 10 עד 25 ימי עסקים.</span></label>
+   <label class="chk"><input type="checkbox" id="cMkt"><span>אני מאשר/ת קבלת דיוור שיווקי (לא חובה)</span></label>
+   <div class="err" id="coErr" role="alert"></div>
+   <button class="btn btn-ink" style="justify-content:center" type="submit" id="coGo">אישור הזמנה · ${money(t.total)}</button>
+  </form><div class="pd-i" style="background:var(--bg);border-radius:0 0 0 26px"><h3 style="font-size:1.2rem">סיכום הזמנה</h3>${t.lines.map(l=>`<div class="sum" style="font-size:.9rem"><span>${esc(l.p.title)} ×${l.q}</span><span>${money(l.p.price*l.q)}</span></div>`).join('')}<hr style="border:0;border-top:1px solid var(--line);width:100%">${t.disc?`<div class="sum" style="color:var(--ok)"><span>הנחה</span><span>−${money(t.disc)}</span></div>`:''}<div class="sum"><span>משלוח</span><span>${t.ship?money(t.ship):'חינם'}</span></div><div class="sum tot"><span>סה״כ</span><span>${money(t.total)}</span></div>
+   <div class="note-box" style="margin:10px 0 0">התשלום מתבצע מול ספק סליקה מורשה. לאחר שליחת ההזמנה תקבלו אישור והנחיות תשלום.</div></div></div>`;
+  closeDrawers();openModal('cm');
+  $('#coForm').addEventListener('submit',submitOrder);
+}
+const rxMail=/^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/, rxPhone=/^[0-9+\-\s()]{7,18}$/;
+async function submitOrder(e){
+  e.preventDefault();
+  const v=id=>($('#'+id).value||'').trim().slice(0,200), err=m=>{$('#coErr').textContent=m;return false};
+  const c={name:v('cName'),phone:v('cPhone'),email:v('cMail'),city:v('cCity'),zip:v('cZip'),addr:v('cAddr'),note:v('cNote').slice(0,300)};
+  if(c.name.length<2)return err('נא למלא שם מלא');
+  if(!rxPhone.test(c.phone))return err('מספר הטלפון אינו תקין');
+  if(!rxMail.test(c.email))return err('כתובת האימייל אינה תקינה');
+  if(c.city.length<2||c.addr.length<3)return err('נא למלא עיר וכתובת מלאה');
+  if(!$('#cTerms').checked)return err('יש לאשר את התקנון כדי להמשיך');
+  $('#coErr').textContent='';$('#coGo').disabled=true;
+  const t=totals();
+  const order={id:'L'+Date.now().toString(36).toUpperCase()+uid().slice(0,3).toUpperCase(),t:Date.now(),status:'new',
+    customer:c,marketing:$('#cMkt').checked,
+    items:t.lines.map(l=>({pid:l.id,title:l.p.title,size:l.size||'',q:l.q,price:l.p.price,cost:l.p.cost||0,supplier:l.p.supplierUrl||'',variant:l.p.supplierVariant||'',supplierTitle:l.p.supplierTitle||''})),
+    subtotal:t.sub,discount:t.disc,coupon:t.disc?t.dcode:'',shipping:t.ship,total:t.total,
+    cost:t.lines.reduce((a,l)=>a+(l.p.cost||0)*l.q,0),paid:false,supplierOrderRef:'',tracking:'',timeline:[{s:'new',t:Date.now()}]};
+  LS.set('lieto_my_orders',LS.get('lieto_my_orders',[]).concat({id:order.id,t:order.t,total:order.total}).slice(-30));
+  let saved=false;
+  if(DB&&MYID){try{await pushOrder(order);saved=true}catch(x){saved=false}}
+  if(!saved){pending.push(order);LS.set('lieto_pending_orders',pending.slice(-20))}
+  LS.set('lieto_cust',{name:c.name,phone:c.phone,email:c.email,city:c.city,zip:c.zip,addr:c.addr});
+  if(t.disc&&COUPONS[state.coupon]&&COUPONS[state.coupon].type==='pct')LS.set('lieto_used_'+state.coupon,true);
+  track('purchase',{total:t.total,oid:order.id});
+  state.cart=[];state.coupon='';saveCart();renderCart();badges();
+  $('#cmSheet').innerHTML=`<button class="x" data-mclose aria-label="סגור">✕</button><div class="doc" style="text-align:center;margin:auto"><h2>תודה, ${esc(c.name.split(' ')[0])}</h2><p>הזמנה <b style="direction:ltr;display:inline-block">${esc(order.id)}</b> התקבלה בסך ${money(order.total)}.</p>${STORE.paymentUrl?`<p>כדי שנעביר את ההזמנה לטיפול, נא להשלים את התשלום.${STORE.paymentNote?' '+esc(STORE.paymentNote):''}</p><p><a class="btn btn-ink" href="${esc(STORE.paymentUrl)}" target="_blank" rel="noopener noreferrer">לתשלום ${money(order.total)}</a></p>`:'<p>נחזור אליכם במייל עם הנחיות תשלום.</p>'}${saved?'':'<p style="color:var(--muted)">ההזמנה נשמרה במכשיר הזה. אם לא קיבלתם אישור במייל תוך שעה, פנו אלינו עם מספר ההזמנה.</p>'}<p style="font-size:.9rem;color:var(--muted)">את מצב ההזמנה אפשר לראות בכל רגע ב"מעקב הזמנה" בתחתית האתר.</p><button class="btn btn-line" data-mclose style="justify-content:center">חזרה לחנות</button></div>`;
+  return false;
+}
+
+/* ---------- admin dashboard ---------- */
+let ORDERS=[],EVENTS=[],SUBS=[],admTab='overview',admRange=30,admQ='',admStatus='all';
+const STAT={new:['ממתינה לתשלום','new'],paid:['שולמה','paid'],ordered:['הוזמנה מהספק','ordered'],shipped:['נשלחה','shipped'],delivered:['נמסרה','shipped'],refunded:['הוחזרה וזוכתה','cancel'],cancel:['בוטלה','cancel']};
+const dstr=t=>new Date(t).toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'2-digit'});
+const dtstr=t=>new Date(t).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+const inRange=o=>admRange===0||o.t>=Date.now()-admRange*864e5;
+const valid=o=>o.status!=='cancel';
+function adminShell(){
+  const a=$('#adm');
+  a.innerHTML=`<div class="adm-top"><div class="logo">LIE<span>T</span>O · ניהול</div><div class="adm-tabs" role="tablist">${[['overview','סקירה'],['drop','דרופשיפינג'],['orders','הזמנות'],['customers','לקוחות'],['products','מוצרים ורווח'],['receipts','קבלות'],['marketing','שיווק']].map(([k,n])=>`<button role="tab" data-tab="${k}" aria-selected="${admTab===k}">${n}</button>`).join('')}</div><button class="btn btn-ghost btn-sm" id="admX">חזרה לחנות</button></div><div class="adm-body" id="admB"></div>`;
+  renderAdmin();
+}
+function renderAdmin(){
+  $$('[data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===admTab||(admTab==='fulfill'&&b.dataset.tab==='drop')||(admTab==='media'&&b.dataset.tab==='products'))));
+  const B=$('#admB');
+  const rangeCtl=`<div class="ctrls"><label for="rng">טווח תאריכים</label><select class="field" id="rng">${[[7,'7 ימים'],[30,'30 ימים'],[90,'90 ימים'],[365,'שנה'],[0,'הכל']].map(([v,n])=>`<option value="${v}" ${admRange===v?'selected':''}>${n}</option>`).join('')}</select><button class="btn btn-line btn-sm" id="exp">ייצוא CSV</button></div>`;
+  const os=ORDERS.filter(o=>inRange(o)&&valid(o));
+  const rev=os.reduce((a,o)=>a+netOf(o),0),cost=os.reduce((a,o)=>a+costOf(o),0),ship=os.reduce((a,o)=>a+(o.shipping||0),0),disc=os.reduce((a,o)=>a+(o.discount||0),0);
+  const profit=rev-cost, aov=os.length?rev/os.length:0, margin=rev?profit/rev*100:0;
+  const views=EVENTS.filter(e=>e.type==='view'&&(admRange===0||e.t>=Date.now()-admRange*864e5)).length, carts=EVENTS.filter(e=>e.type==='add_to_cart'&&(admRange===0||e.t>=Date.now()-admRange*864e5)).length;
+  const notice=!DBREADY?'<div class="note-box">החיבור למסד הנתונים לא פעיל בתצוגה הזו, ולכן לא מוצגים נתונים אמיתיים.</div>':'';
+  if(admTab==='drop'){renderDrop(B,notice);renderImPrev();return}
+  if(admTab==='fulfill'){renderFulfill(B,notice);return}
+  if(admTab==='media'){renderMediaMgr(B,notice);return}
+  if(admTab==='receipts'){renderReceipts(B,notice);return}
+  if(admTab==='overview'){
+    const days=admRange||90, n=Math.min(days,60), buckets=[];
+    for(let i=n-1;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i*Math.ceil(days/n));buckets.push({s:d.getTime(),e:d.getTime()+864e5*Math.ceil(days/n),rv:0,pf:0})}
+    os.forEach(o=>{const b=buckets.find(b=>o.t>=b.s&&o.t<b.e);if(b){b.rv+=netOf(o);b.pf+=netOf(o)-costOf(o)}});
+    const mx=Math.max(1,...buckets.map(b=>b.rv));
+    const tp={};os.forEach(o=>o.items.forEach(i=>{const x=tp[i.title]||(tp[i.title]={q:0,r:0});x.q+=i.q;x.r+=i.q*i.price}));
+    const top=Object.entries(tp).sort((a,b)=>b[1].r-a[1].r).slice(0,6),tmx=Math.max(1,...top.map(t=>t[1].r));
+    B.innerHTML=notice+rangeCtl+`<div class="kpis">
+     <div class="kpi"><span>הכנסות</span><b>${money(rev)}</b><small>${os.length} הזמנות</small></div>
+     <div class="kpi"><span>עלות מוצרים (ספק)</span><b>${money(cost)}</b><small>לפי עלות שהוזנה</small></div>
+     <div class="kpi"><span>רווח גולמי</span><b style="color:var(--ok)">${money(profit)}</b><small>${margin.toFixed(1)}% מרווחיות</small></div>
+     <div class="kpi"><span>ממוצע להזמנה</span><b>${money(aov)}</b><small>הנחות ${money(disc)} · משלוחים ${money(ship)}</small></div>
+     <div class="kpi"><span>צפיות / הוספות לעגלה</span><b>${views} / ${carts}</b><small>${views?(os.length/views*100).toFixed(1):'0'}% המרה</small></div></div>
+     <div class="two"><div class="panel"><h3>הכנסות ורווח לפי תאריך</h3><div class="legend"><span><i style="background:var(--gold)"></i>הכנסות</span><span><i style="background:var(--ok)"></i>רווח</span></div>
+     <div class="bars" role="img" aria-label="גרף הכנסות ורווח">${buckets.map(b=>`<div class="bar" title="${dstr(b.s)}: ${money(b.rv)}"><i class="rv" style="height:${b.rv/mx*100}%"></i></div>`).join('')}</div><div class="axis"><span>${dstr(buckets[0].s)}</span><span>${dstr(buckets[buckets.length-1].s)}</span></div>
+     <div class="bars" style="height:90px;margin-top:10px" aria-hidden="true">${buckets.map(b=>`<div class="bar"><i class="pf" style="height:${Math.max(0,b.pf)/mx*100}%"></i></div>`).join('')}</div></div>
+     <div class="panel"><h3>מוצרים מובילים</h3>${top.length?top.map(([n,x])=>`<div class="hbar"><span>${esc(n)}</span><div><i style="width:${x.r/tmx*100}%"></i></div><b>${money(x.r)}</b></div>`).join(''):'<div class="empty">אין עדיין מכירות בטווח.</div>'}</div></div>
+     <div class="panel"><h3>הזמנות אחרונות</h3>${ordersTable(ORDERS.slice().sort((a,b)=>b.t-a.t).slice(0,6),true)}</div>`;
+  } else if(admTab==='orders'){
+    const l=ORDERS.filter(o=>inRange(o)&&(admStatus==='all'||o.status===admStatus)&&(!admQ||(o.id+o.customer.name+o.customer.email+o.customer.phone).toLowerCase().includes(admQ.toLowerCase()))).sort((a,b)=>b.t-a.t);
+    B.innerHTML=notice+rangeCtl+`<div class="ctrls"><input class="field grow" id="aq" placeholder="חיפוש לפי שם, אימייל, טלפון או מספר הזמנה" value="${esc(admQ)}"><select class="field" id="ast"><option value="all">כל הסטטוסים</option>${Object.entries(STAT).map(([k,v])=>`<option value="${k}" ${admStatus===k?'selected':''}>${v[0]}</option>`).join('')}</select></div><div class="panel">${ordersTable(l,false)}</div>`;
+  } else if(admTab==='customers'){
+    const m={};ORDERS.filter(valid).forEach(o=>{const k=o.customer.email.toLowerCase();const x=m[k]||(m[k]={name:o.customer.name,email:o.customer.email,phone:o.customer.phone,city:o.customer.city,n:0,spent:0,first:o.t,last:o.t,mkt:false});x.n++;x.spent+=o.total;x.first=Math.min(x.first,o.t);x.last=Math.max(x.last,o.t);x.mkt=x.mkt||o.marketing});
+    const l=Object.values(m).sort((a,b)=>b.spent-a.spent);
+    B.innerHTML=notice+`<div class="kpis"><div class="kpi"><span>לקוחות</span><b>${l.length}</b></div><div class="kpi"><span>לקוחות חוזרים</span><b>${l.filter(x=>x.n>1).length}</b></div><div class="kpi"><span>ערך לקוח ממוצע</span><b>${money(l.length?l.reduce((a,x)=>a+x.spent,0)/l.length:0)}</b></div><div class="kpi"><span>הסכימו לדיוור</span><b>${l.filter(x=>x.mkt).length}</b></div></div><div class="panel"><h3>לקוחות</h3><div class="tblwrap"><table><thead><tr><th>שם</th><th>אימייל</th><th>טלפון</th><th>עיר</th><th>הזמנות</th><th>סה״כ</th><th>הזמנה ראשונה</th><th>אחרונה</th><th>דיוור</th></tr></thead><tbody>${l.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.email)}</td><td class="n">${esc(x.phone)}</td><td>${esc(x.city)}</td><td class="n">${x.n}</td><td class="n">${money(x.spent)}</td><td class="n">${dstr(x.first)}</td><td class="n">${dstr(x.last)}</td><td>${x.mkt?'כן':'לא'}</td></tr>`).join('')||'<tr><td colspan="9"><div class="empty">אין עדיין לקוחות.</div></td></tr>'}</tbody></table></div></div>
+     <div class="panel"><h3>נרשמים לניוזלטר (${SUBS.length})</h3><div class="tblwrap"><table><thead><tr><th>אימייל</th><th>תאריך</th></tr></thead><tbody>${SUBS.slice().sort((a,b)=>b.t-a.t).map(s=>`<tr><td>${esc(s.email)}</td><td class="n">${dtstr(s.t)}</td></tr>`).join('')||'<tr><td colspan="2">אין נרשמים עדיין.</td></tr>'}</tbody></table></div></div>`;
+  } else if(admTab==='products'){
+    const sold={};ORDERS.filter(valid).forEach(o=>o.items.forEach(i=>{const x=sold[i.pid]||(sold[i.pid]={q:0,r:0});x.q+=i.q;x.r+=i.q*i.price}));
+    B.innerHTML=notice+`<div class="note-box">כאן מגדירים לכל מוצר מחיר מכירה, עלות אצל הספק ופרטי המוצר אצל הספק. הרווח מחושב מהפער ביניהם. המחירים והעלויות בדוגמאות הם הערכות שלי ויש לעדכן לנתוני הספק האמיתיים.</div><div class="panel"><div class="tblwrap"><table><thead><tr><th>מוצר</th><th>מחיר מכירה</th><th>מחיר לפני הנחה</th><th>עלות ספק</th><th>רווח ליח׳</th><th>קישור ואפשרות אצל הספק</th><th>נמכרו</th><th>פעיל</th><th>תמונות וסרטונים</th></tr></thead><tbody>${liveProducts().concat(PRODUCTS.filter(p=>OVR[p.id]&&OVR[p.id].active===false).map(p=>Object.assign({},p,OVR[p.id]))).map(p=>`<tr data-pid="${p.id}"><td><b>${esc(p.title)}</b><div style="color:var(--muted)">${esc(CAT_NAME[p.cat]||'')}</div>${STORE.heroId===p.id?'<span class="pill paid" style="margin-top:4px">★ בתמונת הדגל</span>':`<button class="lnk" data-hero="${p.id}" style="font-size:.78rem">הצגה בתמונת הדגל</button>`}</td><td><input class="field" style="width:84px" type="number" min="0" step="0.5" data-f="price" value="${p.price}"></td><td><input class="field" style="width:84px" type="number" min="0" step="0.5" data-f="was" value="${p.was||0}"></td><td><input class="field" style="width:84px" type="number" min="0" step="0.5" data-f="cost" value="${p.cost||0}"></td><td class="n" style="color:var(--ok)">${money(p.price-(p.cost||0))}</td><td><input class="field" style="width:200px;direction:ltr" type="url" placeholder="קישור אצל הספק (לא חובה)" data-f="supplierUrl" value="${esc(p.supplierUrl||'')}"><input class="field" style="width:200px;direction:ltr;margin-top:4px" placeholder="אפשרות אצל הספק" data-f="supplierVariant" value="${esc(p.supplierVariant||'')}"><input class="field" style="width:200px;direction:ltr;margin-top:4px" placeholder="שם אצל הספק (לזיהוי)" data-f="supplierTitle" value="${esc(p.supplierTitle||'')}"></td><td class="n">${(sold[p.id]||{q:0}).q}</td><td><input type="checkbox" data-f="active" ${p.active===false?'':'checked'} aria-label="פעיל"></td><td>${(()=>{const ml=mediaOf(p),ni=ml.filter(x=>x.t==='img').length,nv=ml.length-ni;return`<button class="btn btn-line btn-sm" data-mm="${p.id}">${ml.length?[ni?(ni===1?'תמונה אחת':ni+' תמונות'):'',nv?(nv===1?'סרטון אחד':nv+' סרטונים'):''].filter(Boolean).join(' · ')+' · עריכה':'הוספת תמונות וסרטונים'}</button>`})()}</td></tr>`).join('')}</tbody></table></div><div class="ctrls" style="margin-top:12px"><button class="btn btn-ink btn-sm" id="saveProd">שמירת שינויים</button><span id="saveMsg" role="status"></span></div></div>`;
+  } else if(admTab==='marketing'){
+    const ev=EVENTS.filter(e=>admRange===0||e.t>=Date.now()-admRange*864e5);const c=t=>ev.filter(e=>e.type===t).length;
+    const funnel=[['צפיות במוצר',c('view')],['הוספות לעגלה',c('add_to_cart')],['התחלת תשלום',c('begin_checkout')],['רכישות',c('purchase')]],fm=Math.max(1,funnel[0][1]);
+    const used={};ORDERS.filter(o=>o.coupon).forEach(o=>used[o.coupon]=(used[o.coupon]||0)+1);
+    B.innerHTML=notice+rangeCtl+`<div class="two"><div class="panel"><h3>משפך המרה</h3>${funnel.map(([n,v])=>`<div class="hbar"><span>${n}</span><div><i style="width:${v/fm*100}%"></i></div><b>${v}</b></div>`).join('')}</div>
+     <div class="panel"><h3>קופונים פעילים</h3>${Object.entries(COUPONS).map(([k,v])=>`<div class="hbar" style="grid-template-columns:1fr auto"><span><b style="direction:ltr;display:inline-block">${esc(k)}</b> · ${esc(v.label||'')}</span><b>${used[k]||0} שימושים</b></div>`).join('')}
+     <form id="cpnForm" class="ctrls" style="margin-top:14px"><input class="field" id="nc" placeholder="קוד חדש" maxlength="14" style="width:120px;direction:ltr"><input class="field" id="nv" type="number" min="1" max="90" placeholder="% הנחה" style="width:100px"><input class="field grow" id="nl" placeholder="תיאור" maxlength="60"><label class="sr" for="nu">תוקף עד</label><input class="field" id="nu" type="date" title="תוקף עד (לא חובה)"><button class="btn btn-ink btn-sm" type="submit">הוספת קופון</button></form></div></div>
+     <div class="panel"><h3>כלי שיווק מובנים באתר</h3><div class="tblwrap"><table><thead><tr><th>כלי</th><th>מה הוא עושה</th></tr></thead><tbody>
+      <tr><td>קופון הצטרפות</td><td>LIETO10 לרשומים ולהזמנה ראשונה</td></tr><tr><td>הנחת כמות</td><td>PAIR15 לשני פריטים ומעלה</td></tr><tr><td>סרגל משלוח חינם</td><td>מעודד הגדלת סל עד ${money(STORE.freeShipFrom)}</td></tr><tr><td>"משלימים את הלוק"</td><td>הצעת מוצר משלים בעגלה (Upsell)</td></tr><tr><td>נצפו לאחרונה</td><td>החזרת גולשים למוצרים שראו</td></tr><tr><td>מועדפים</td><td>שמירת מוצרים לחזרה מאוחרת</td></tr><tr><td>תזכורת עגלה</td><td>הודעה בכניסה חוזרת למי שהשאיר פריטים בעגלה</td></tr><tr><td>איסוף מנויים</td><td>רשימת דיוור עם הסכמה מפורשת, ${SUBS.length} נרשמים</td></tr><tr><td>מעקב אירועים</td><td>צפיות, עגלה, תשלום ורכישה לשיפור ההמרה</td></tr></tbody></table></div></div>`;
+  }
+}
+function ordersTable(l,compact){
+  if(!l.length)return'<div class="empty">אין הזמנות בטווח שנבחר.</div>';
+  return`<div class="tblwrap"><table><thead><tr><th>הזמנה</th><th>תאריך</th><th>לקוח</th><th>פריטים</th><th>סה״כ</th><th>רווח</th><th>סטטוס</th>${compact?'':'<th>ביצוע</th>'}</tr></thead><tbody>${l.map(o=>{const st=STAT[o.status]||STAT.new;
+   return`<tr data-oid="${esc(o.id)}"><td class="n"><b>${esc(o.id)}</b></td><td class="n">${dtstr(o.t)}</td><td>${esc(o.customer.name)}<div style="color:var(--muted)">${esc(o.customer.email)} · ${esc(o.customer.phone)}</div><div style="color:var(--muted)">${esc(o.customer.addr)}, ${esc(o.customer.city)} ${esc(o.customer.zip||'')}</div></td>
+   <td>${o.items.map(i=>`<div>${esc(i.title)} ×${i.q}${i.size?' ('+esc(i.size)+')':''} ${safeUrl(i.supplier)?`<a href="${esc(safeUrl(i.supplier))}" target="_blank" rel="noopener noreferrer">ספק ↗</a>`:''}</div>`).join('')}</td>
+   <td class="n">${money(o.total)}</td><td class="n" style="color:var(--ok)">${money(netOf(o)-costOf(o))}</td>
+   <td><span class="pill ${st[1]}">${st[0]}</span></td>
+   ${compact?'':`<td><button class="btn btn-ink btn-sm" data-ful="${esc(o.id)}">טיפול בהזמנה</button>${o.tracking?`<div style="font-size:.8rem;direction:ltr;margin-top:4px">${esc(o.tracking)}</div>`:''}</td>`}</tr>`}).join('')}</tbody></table></div>`;
+}
+function csvOrders(){
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""').replace(/^([=+\-@])/,"'$1")+'"';
+  const rows=[['מספר הזמנה','תאריך','סטטוס','שם','אימייל','טלפון','עיר','כתובת','פריטים','סכום ביניים','הנחה','משלוח','סה"כ','עלות ספק','רווח','מעקב']];
+  ORDERS.filter(inRange).forEach(o=>rows.push([o.id,dtstr(o.t),(STAT[o.status]||STAT.new)[0],o.customer.name,o.customer.email,o.customer.phone,o.customer.city,o.customer.addr,o.items.map(i=>i.title+' x'+i.q).join(' | '),o.subtotal,o.discount,o.shipping,o.total,costOf(o),netOf(o)-costOf(o),o.tracking||'']));
+  return '﻿'+rows.map(r=>r.map(q).join(',')).join('\n');
+}
+/* ---------- dropshipping engine ---------- */
+Object.assign(STORE,{usdRate:3.7,feePct:2.5,targetMargin:55,round9:true,paymentUrl:'',paymentNote:'',shipMin:10,shipMax:25});
+const DAY=864e5;
+const costOf=o=>{const a=o.actualCost;return(a!==undefined&&a!==null&&a!==''&&isFinite(+a))?+a:(o.cost||0)};
+const netOf=o=>o.total-(+o.refund||0);
+let FOCUS=null;
+function suggestPrice(costIls){const m=Math.min(.85,STORE.targetMargin/100),f=STORE.feePct/100;let p=costIls/Math.max(.08,1-m-f);if(STORE.round9)p=Math.max(9,Math.ceil((p+1)/10)*10-1);return Math.round(p*100)/100}
+function applySettings(x){if(!x)return;const num=(k,lo,hi)=>{const n=parseFloat(x[k]);if(isFinite(n))STORE[k]=Math.min(hi,Math.max(lo,n))};
+  num('usdRate',1,10);num('feePct',0,15);num('targetMargin',5,85);num('freeShipFrom',0,5000);num('shipFee',0,200);num('shipMin',1,90);num('shipMax',1,120);
+  STORE.round9=x.round9!==false;STORE.bizType=x.bizType==='murshe'?'murshe':'patur';if(okSrc(x.logo))STORE.logo=x.logo;if(typeof x.heroId==='string')STORE.heroId=x.heroId.slice(0,40);if(typeof x.heroCoupon==='string')STORE.heroCoupon=x.heroCoupon.slice(0,20);STORE.heroVideo=okSrc(x.heroVideo)?x.heroVideo:'';STORE.heroVideoMobile=okSrc(x.heroVideoMobile)?x.heroVideoMobile:'';STORE.heroPosterMobile=okSrc(x.heroPosterMobile)?x.heroPosterMobile:'';STORE.heroPoster=okSrc(x.heroPoster)?x.heroPoster:'';if(Array.isArray(x.lookbook))STORE.lookbook=x.lookbook.filter(l=>l&&okSrc(l.src)).slice(0,8).map(l=>({src:l.src,cap:String(l.cap||'').slice(0,40),pid:String(l.pid||'').slice(0,40)}));STORE.paymentUrl=safeUrl(x.paymentUrl||'');
+  ['paymentNote','business','address','email','phone','bizId'].forEach(k=>{if(typeof x[k]==='string'&&x[k].trim())STORE[k]=x[k].trim().slice(0,160)});
+  renderAll()}
+function stampOf(o,s){const x=(o.timeline||[]).filter(e=>e.s===s).pop();return x?x.t:null}
+function alertsFor(list){const now=Date.now(),a={unpaid:[],toOrder:[],noTrack:[],late:[]};
+  list.forEach(o=>{
+    if(o.status==='new'&&now-o.t>2*DAY)a.unpaid.push(o);
+    if(o.status==='paid'&&now-(stampOf(o,'paid')||o.t)>DAY)a.toOrder.push(o);
+    if(o.status==='ordered'&&!o.tracking&&now-(stampOf(o,'ordered')||o.t)>5*DAY)a.noTrack.push(o);
+    if(o.status==='shipped'&&now-(stampOf(o,'shipped')||o.t)>STORE.shipMax*DAY)a.late.push(o)});
+  return a}
+async function updateOrder(id,patch,newStatus){
+  const o=ORDERS.find(x=>x.id===id);if(!o||!DB)throw new Error('missing');
+  const ref=DB.doc('orders/'+o._owner),s=await ref.get();const list=(s.exists&&s.data().list)||[];const it=list.find(x=>x.id===id);if(!it)throw new Error('missing');
+  Object.assign(it,patch);
+  if(newStatus&&it.status!==newStatus){it.status=newStatus;it.timeline=(it.timeline||[{s:'new',t:it.t}]).concat({s:newStatus,t:Date.now()})}
+  await ref.set({list});Object.assign(o,it)}
+const trackUrl=n=>'https://t.17track.net/en#nums='+encodeURIComponent(n);
+function intlPhone(p){let x=String(p||'').replace(/[^\d+]/g,'');if(x.startsWith('0'))x='+972'+x.slice(1);return x}
+function addrBlock(o){const c=o.customer;return['Contact name: '+c.name,'Mobile: '+intlPhone(c.phone),'Street address: '+c.addr,'City: '+c.city,'ZIP code: '+(c.zip||''),'Country: Israel'].join('\n')}
+const TPL={
+  supplier:o=>{const c=o.customer;const lines=o.items.map((i,n)=>{const gp=getProd(i.pid);const ref=i.supplierTitle||gp.supplierTitle||'';return `${n+1}. ${i.title}${ref&&ref!=='ספק אישי'?' ['+ref+']':''} | ${i.size||'-'} | qty ${i.q}`}).join('\n');
+    return `New order ${o.id}\n\nItems:\n${lines}\n\nShip to:\nName: ${c.name}\nPhone: ${intlPhone(c.phone)}\nAddress: ${c.addr}\nCity: ${c.city}\nZIP: ${c.zip||''}\nCountry: Israel\n\nPlease ship with tracking, neutral packaging, no invoice or price inside. Send me the tracking number when shipped. Thank you!`},
+  supnote:o=>`Dropshipping order for my customer. Please do NOT include any invoice, receipt, price tag, flyer, coupon card or seller promotional material in the package. Plain neutral packaging only, no logos. Thank you!`,
+  supask:o=>`Hello, I run a jewelry store and plan to order from you regularly as a dropshipper.\n1. Can you ship in plain neutral packaging (no logo, no invoice, no price, no flyers)?\n2. Can you add a small branded card or pouch with my logo "LIETO"? What is the price and the minimum quantity?\n3. Can you send a photo of the package before shipping for the first orders?\nThank you!`,
+  confirm:o=>`שלום ${o.customer.name},\nתודה על ההזמנה ב-LIETO.\nמספר הזמנה: ${o.id}\nסכום לתשלום: ${money(o.total)}\n${STORE.paymentUrl?'קישור לתשלום: '+STORE.paymentUrl+'\n':''}זמן אספקה משוער: ${STORE.shipMin} עד ${STORE.shipMax} ימי עסקים. נשלח מספר מעקב כשהמשלוח יוצא.\nצוות LIETO`,
+  shipped:o=>`שלום ${o.customer.name},\nההזמנה ${o.id} יצאה לדרך.\n${o.carrier?'חברת שילוח: '+o.carrier+'\n':''}מספר מעקב: ${o.tracking||'-'}\n${o.tracking?'מעקב: '+trackUrl(o.tracking)+'\n':''}צוות LIETO`,
+  delay:o=>`שלום ${o.customer.name},\nרצינו לעדכן שההזמנה ${o.id} מתעכבת מעט בדרך. אנחנו עוקבים אחריה ונעדכן ברגע שתהיה תזוזה.\nתודה על הסבלנות,\nצוות LIETO`,
+  refund:o=>`שלום ${o.customer.name},\nאישרנו זיכוי של ${money(+o.refund||0)} עבור הזמנה ${o.id}. הזיכוי יופיע באמצעי התשלום המקורי בתוך עד 14 ימים.\nצוות LIETO`};
+async function copyText(txt,btn){try{await navigator.clipboard.writeText(txt);toast('הועתק')}catch(e){const ta=btn&&btn.parentElement&&btn.parentElement.querySelector('textarea');if(ta){ta.hidden=false;ta.focus();ta.select()}toast('סמנו את הטקסט והעתיקו ידנית')}}
+function copyBox(label,txt,key){return`<div class="cpy"><button class="btn btn-line btn-sm" data-copy="${key}">${label}</button><textarea class="field" rows="6" hidden readonly>${esc(txt)}</textarea></div>`}
+function ordLink(o){return`<button class="lnk" data-ful="${esc(o.id)}">${esc(o.id)}</button>`}
+
+function renderDrop(B,notice){
+  const live=ORDERS.filter(o=>o.status!=='cancel'),al=alertsFor(live);
+  const box=(n,label,list,tone)=>`<div class="kpi" style="border-color:${list.length?'var(--'+tone+')':'var(--line)'}"><span>${label}</span><b style="color:${list.length?'var(--'+tone+')':'inherit'}">${list.length}</b><small>${list.slice(0,3).map(ordLink).join(' ')||'אין'}</small></div>`;
+  const q=live.filter(o=>['new','paid','ordered','shipped'].includes(o.status)).sort((a,b)=>a.t-b.t);
+  const rate=STORE.usdRate;
+  B.innerHTML=notice+`<div class="note-box">סדר העבודה בכל הזמנה: הלקוח מזמין ומשלם ← שולחים לספק את פרטי ההזמנה בכפתור "העתקת ההזמנה לספק" ← מעדכנים מספר מעקב ← שולחים ללקוח עדכון. כל השלבים מרוכזים כאן.</div>
+  <div class="kpis">${box(1,'ממתינות לתשלום מעל יומיים',al.unpaid,'warn')}${box(2,'שולמו ועוד לא הוזמנו מהספק',al.toOrder,'bad')}${box(3,'הוזמנו בלי מספר מעקב 5+ ימים',al.noTrack,'warn')}${box(4,'במשלוח מעל '+STORE.shipMax+' יום',al.late,'bad')}</div>
+  <div class="panel"><h3>תור ביצוע (${q.length})</h3>${q.length?`<div class="tblwrap"><table><thead><tr><th>הזמנה</th><th>נכנסה</th><th>ימים</th><th>לקוח</th><th>פריטים</th><th>סטטוס</th><th></th></tr></thead><tbody>${q.map(o=>{const st=STAT[o.status]||STAT.new;return`<tr><td class="n"><b>${esc(o.id)}</b></td><td class="n">${dtstr(o.t)}</td><td class="n">${Math.floor((Date.now()-o.t)/DAY)}</td><td>${esc(o.customer.name)}<div style="color:var(--muted)">${esc(o.customer.city)}</div></td><td>${o.items.map(i=>esc(i.title)+' ×'+i.q).join('<br>')}</td><td><span class="pill ${st[1]}">${st[0]}</span></td><td><button class="btn btn-ink btn-sm" data-ful="${esc(o.id)}">לטיפול</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">אין הזמנות פתוחות. כל ההזמנות טופלו.</div>'}</div>
+  <div class="two">
+   <div class="panel"><h3>הוספת מוצר חדש</h3>
+    <form id="imForm" class="co" novalidate>
+     <label class="l">קישור או קטלוג אצל הספק (לא חובה)<input class="field" id="imUrl" type="url" placeholder="https://..." style="direction:ltr"></label>
+     <label class="l">שם המוצר אצל הספק (לזיהוי בלבד, לא מוצג ללקוחות)<input class="field" id="imSupTitle" maxlength="200" style="direction:ltr" placeholder="שם או מק״ט אצל הספק"></label>
+     <label class="l">איזו אפשרות לבחור אצל הספק<input class="field" id="imVar" maxlength="120" style="direction:ltr" placeholder="Metal Color: 2MM Width"></label>
+     <small style="color:var(--muted);margin-top:-6px">אם בעמוד הספק יש כמה פריטים או צבעים, כתבו כאן בדיוק את האפשרות שאתם מוכרים, כמו שהיא כתובה אצל הספק. היא תופיע בכל הזמנה ליד הקישור.</small>
+     <label class="l">שם המוצר בחנות (מה שהלקוחות רואים)<input class="field" id="imTitle" maxlength="80" required placeholder="לדוגמה: שרשרת פנינים וקובנית שחורה"></label>
+     <div class="row2"><label class="l">קטגוריה<select class="field" id="imCat">${CATS.map(c=>`<option value="${c[0]}">${esc(c[1])}</option>`).join('')}</select></label>
+      <label class="l">צבע מתכת (לאיור עד שתעלה תמונה)<select class="field" id="imMetal"><option value="gold">זהב</option><option value="silver">כסף</option><option value="rose">רוז גולד</option><option value="black">שחור</option></select></label></div>
+     <label class="l">חומר (כמו שמופיע אצל הספק)<input class="field" id="imMat" maxlength="80" placeholder="לדוגמה: כסף 925, ציפוי זהב 18K"></label>
+     <label class="l">תיאור קצר<textarea class="field" id="imDesc" rows="2" maxlength="400"></textarea></label>
+     <label class="l">מידות / וריאציות, מופרדות בפסיק<input class="field" id="imSizes" maxlength="120" placeholder="6, 7, 8, 9"></label>
+     <div><span style="font-size:.86rem;color:var(--muted)">תמונות וסרטונים</span>
+      <label class="drop" id="imDrop" for="imMedia" style="margin-top:4px"><b>בחירת תמונות וסרטונים</b><small>עד 8 קבצים · לחצו, גררו לכאן או הדביקו תמונה שהעתקתם (Ctrl+V) · התמונה הראשונה תהיה הראשית</small></label>
+      <input type="file" id="imMedia" multiple accept="image/*,.heic,.heif,video/*,.mov,.mp4" class="sr">
+      <div class="prev" id="imPrev"></div><div class="prog" id="imProg" role="status" aria-live="polite"></div></div>
+     <div class="row2"><label class="l">מחיר אצל הספק ($)<input class="field" id="imCost" type="number" min="0" step="0.01" required></label><label class="l">משלוח לישראל אצל הספק ($)<input class="field" id="imShip" type="number" min="0" step="0.01" value="0"></label></div>
+     <div class="calc" id="imCalc">הזינו מחיר ספק כדי לקבל תמחור מומלץ.</div>
+     <div class="row2"><label class="l">מחיר מכירה (₪)<input class="field" id="imPrice" type="number" min="1" step="1" required></label><label class="l">מחיר לפני הנחה (₪, לא חובה)<input class="field" id="imWas" type="number" min="0" step="1"></label></div>
+     <div class="err" id="imErr" role="alert"></div>
+     <button class="btn btn-ink" type="submit" style="justify-content:center">הוספה לחנות</button>
+     <small style="color:var(--muted)">אחרי ההוספה אפשר להעלות תמונה אמיתית בלשונית "מוצרים ורווח".</small>
+    </form></div>
+   <div class="panel"><h3>הגדרות דרופשיפינג</h3>
+    <form id="setForm" class="co" novalidate>
+     <div class="row2"><label class="l">שער דולר (₪)<input class="field" id="sRate" type="number" step="0.01" min="1" value="${rate}"></label><label class="l">עמלת סליקה (%)<input class="field" id="sFee" type="number" step="0.1" min="0" value="${STORE.feePct}"></label></div>
+     <div class="row2"><label class="l">יעד רווחיות (%)<input class="field" id="sMargin" type="number" step="1" min="5" max="85" value="${STORE.targetMargin}"></label><label class="chk" style="align-self:end"><input type="checkbox" id="sRound" ${STORE.round9?'checked':''}><span>עיגול מחיר לסיומת 9</span></label></div>
+     <div class="row2"><label class="l">משלוח חינם מעל (₪)<input class="field" id="sFree" type="number" min="0" value="${STORE.freeShipFrom}"></label><label class="l">דמי משלוח (₪)<input class="field" id="sShipFee" type="number" min="0" value="${STORE.shipFee}"></label></div>
+     <div class="row2"><label class="l">זמן אספקה מינימלי (ימים)<input class="field" id="sShipMin" type="number" min="1" value="${STORE.shipMin}"></label><label class="l">זמן אספקה מקסימלי (ימים)<input class="field" id="sShipMax" type="number" min="1" value="${STORE.shipMax}"></label></div>
+     <label class="l">קישור תשלום (PayBox, Bit לעסקים, PayPal, דף סליקה)<input class="field" id="sPay" type="url" style="direction:ltr" placeholder="https://..." value="${esc(STORE.paymentUrl)}"></label>
+     <label class="l">הנחיה לתשלום שתוצג ללקוח<input class="field" id="sPayNote" maxlength="160" value="${esc(STORE.paymentNote)}" placeholder="לדוגמה: נא לרשום את מספר ההזמנה בהערות"></label>
+     <div class="row2"><label class="l">מספר עוסק / ח.פ.<input class="field" id="sBizId" maxlength="20" inputmode="numeric" style="direction:ltr" value="${esc(STORE.bizId||'')}"></label><label class="l">סוג העסק<select class="field" id="sBizType"><option value="patur" ${STORE.bizType!=='murshe'?'selected':''}>עוסק פטור</option><option value="murshe" ${STORE.bizType==='murshe'?'selected':''}>עוסק מורשה</option></select></label></div>
+     <div class="row2"><label class="l">לוגו לקבלות (PNG או JPG)<input class="field" id="sLogo" type="file" accept="image/png,image/jpeg,image/webp"></label><div style="align-self:end;font-size:.84rem;color:var(--muted)">${okSrc(STORE.logo)?`<img src="${esc(STORE.logo)}" alt="הלוגו הנוכחי" style="max-height:44px;max-width:160px;display:block;margin-bottom:4px">לוגו נוכחי`:'בלי לוגו, יוצג השם LIETO באותיות'}</div></div>
+     <div class="row2"><label class="l">שם העסק (כפי שרשום ברשויות)<input class="field" id="sBiz" maxlength="120" value="${esc(STORE.business)}"></label><label class="l">כתובת העסק<input class="field" id="sAddr" maxlength="120" value="${esc(STORE.address)}"></label></div>
+     <div class="row2"><label class="l">אימייל שירות<input class="field" id="sMail" maxlength="120" value="${esc(STORE.email)}"></label><label class="l">טלפון שירות<input class="field" id="sPhone" maxlength="40" value="${esc(STORE.phone)}"></label></div>
+     <button class="btn btn-ink" type="submit" style="justify-content:center">שמירת הגדרות</button>
+     <small style="color:var(--muted)">פרטי העסק מתעדכנים אוטומטית בתקנון, במדיניות הפרטיות ובעמוד יצירת הקשר.</small>
+    </form></div>
+  </div>`;
+}
+function renderFulfill(B,notice){
+  const o=ORDERS.find(x=>x.id===FOCUS);if(!o){FOCUS=null;admTab='drop';renderAdmin();return}
+  const st=STAT[o.status]||STAT.new,done=s=>stampOf(o,s)||(s==='new'?o.t:null),cost=costOf(o);
+  const stepCls=s=>done(s)?'step2 done':'step2';
+  B.innerHTML=notice+`<div class="ctrls"><button class="btn btn-line btn-sm" data-back>→ חזרה לתור</button><h2 style="font-size:1.6rem;direction:ltr">${esc(o.id)}</h2><span class="pill ${st[1]}">${st[0]}</span><span style="color:var(--muted)">${dtstr(o.t)} · ${money(o.total)} · רווח משוער ${money(netOf(o)-cost)}</span></div>
+  <div class="two"><div>
+   <div class="${stepCls('paid')}"><h3>1. תשלום</h3><p>הלקוח צריך לשלם ${money(o.total)}. ${STORE.paymentUrl?'קישור התשלום הוצג לו בסיום ההזמנה.':'עוד לא הוגדר קישור תשלום בלשונית דרופשיפינג.'}</p>${done('paid')?`<p class="okline">שולם · ${dtstr(done('paid'))}</p>`:`<div class="ctrls" style="margin:0"><label class="sr" for="fPay">אמצעי תשלום</label><select class="field" id="fPay">${PAY_METHODS.map(m=>`<option>${m}</option>`).join('')}</select><button class="btn btn-ink btn-sm" data-ost="paid">סימון כשולם והפקת קבלה</button></div>`}
+   ${(()=>{const r=RECEIPTS.find(x=>x.orderId===o.id&&x.status!=='void');if(r)return`<div class="rcline">${docTitle(r)} מס׳ <b dir="ltr">${rcNo(r.no)}</b> · <button class="lnk" data-rcdl="${r.no}">הורדת PDF</button> · ${r.driveId&&r.backedStatus===r.status?`<a href="${esc(r.driveUrl||'#')}" target="_blank" rel="noopener noreferrer">✓ שמורה בדרייב</a>`:`<button class="lnk" data-rcup="${r.no}">גיבוי לדרייב</button>`}</div>`;return done('paid')?`<div class="rcline"><button class="btn btn-line btn-sm" data-rcmake="${esc(o.id)}">הפקת קבלה</button></div>`:''})()}</div>
+   <div class="${stepCls('ordered')}"><h3>2. הזמנה מהספק</h3>
+    ${o.items.map(i=>{const gp=getProd(i.pid),vr=i.variant||gp.supplierVariant||'',sn=i.supplierTitle||gp.supplierTitle||'';return`<div class="fitem"><div><b>${esc(i.title)}</b> ×${i.q}${i.size?' · מידה '+esc(i.size):''}${sn?`<div class="supname" dir="ltr">אצל הספק: ${esc(sn)}</div>`:''}${vr?`<div class="pickvar">לבחור אצל הספק: <b dir="ltr">${esc(vr)}</b>${i.size?' · אורך/מידה: <b>'+esc(i.size)+'</b>':''}</div>`:''}<div style="color:var(--muted);font-size:.85rem">עלות משוערת ${money((i.cost||0)*i.q)}</div></div>${safeUrl(i.supplier)?`<a class="btn btn-line btn-sm" href="${esc(safeUrl(i.supplier))}" target="_blank" rel="noopener noreferrer">פתיחה אצל הספק ↗</a>`:''}</div>`}).join('')}
+    <p style="margin:12px 0 6px;font-size:.88rem">פרטי ההזמנה לספק, באנגלית, מוכנים להדבקה בוואטסאפ, ב-WeChat או במייל. את השם, הרחוב והעיר כדאי לכתוב באנגלית לפני השליחה:</p><pre class="addr">${esc(TPL.supplier(o))}</pre>${copyBox('העתקת ההזמנה לספק',TPL.supplier(o),'supplier')}<p style="margin:14px 0 6px;font-size:.88rem">כתובת בלבד:</p><pre class="addr">${esc(addrBlock(o))}</pre>${copyBox('העתקת הכתובת',addrBlock(o),'addr')}<p style="margin:12px 0 6px;font-size:.88rem">הודעות קבועות לספק:</p>${copyBox('העתקת הערה לספק',TPL.supnote(o),'supnote')}<div style="margin-top:8px">${copyBox('הודעה לספק חדש: אריזה ניטרלית ומיתוג',TPL.supask(o),'supask')}</div>
+    <div class="row2" style="margin-top:12px"><label class="l">מספר הזמנה אצל הספק<input class="field" id="fRef" style="direction:ltr" maxlength="40" value="${esc(o.supplierOrderRef||'')}"></label><label class="l">כמה שילמת לספק בפועל (₪)<input class="field" id="fCost" type="number" min="0" step="0.01" value="${o.actualCost!==undefined&&o.actualCost!==''?esc(o.actualCost):''}" placeholder="${(o.cost||0).toFixed(2)}"></label></div>
+    ${done('ordered')?`<p class="okline">הוזמן מהספק · ${dtstr(done('ordered'))}</p><button class="btn btn-line btn-sm" data-ost="">שמירת שינויים</button>`:'<button class="btn btn-ink btn-sm" data-ost="ordered">שמירה וסימון כהוזמן מהספק</button>'}</div>
+   <div class="${stepCls('shipped')}"><h3>3. משלוח</h3><p style="font-size:.88rem">את מספר המעקב מקבלים מהספק אחרי שהוא שולח.</p>
+    <div class="row2"><label class="l">חברת שילוח<input class="field" id="fCar" maxlength="40" value="${esc(o.carrier||'')}" placeholder="YunExpress / 4PX / דואר ישראל"></label><label class="l">מספר מעקב<input class="field" id="fTrk" maxlength="60" style="direction:ltr" value="${esc(o.tracking||'')}"></label></div>
+    ${o.tracking?`<p><a href="${esc(trackUrl(o.tracking))}" target="_blank" rel="noopener noreferrer">בדיקת מיקום המשלוח ↗</a></p>`:''}
+    ${done('shipped')?`<p class="okline">נשלח · ${dtstr(done('shipped'))}</p><button class="btn btn-line btn-sm" data-ost="">שמירת שינויים</button>`:'<button class="btn btn-ink btn-sm" data-ost="shipped">שמירה וסימון כנשלח</button>'}</div>
+   <div class="${stepCls('delivered')}"><h3>4. מסירה, החזרה או ביטול</h3>
+    ${done('delivered')?`<p class="okline">נמסר · ${dtstr(done('delivered'))}</p>`:'<button class="btn btn-ink btn-sm" data-ost="delivered">סימון כנמסר</button>'}
+    <div class="row2" style="margin-top:12px"><label class="l">סכום זיכוי ללקוח (₪)<input class="field" id="fRefund" type="number" min="0" max="${o.total}" step="0.01" value="${o.refund?esc(o.refund):''}"></label><div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap"><button class="btn btn-line btn-sm" data-ost="refunded">רישום החזרה וזיכוי</button><button class="btn btn-line btn-sm" data-ost="cancel" style="color:var(--bad)">ביטול הזמנה</button></div></div></div>
+  </div><div>
+   <div class="panel"><h3>לקוח</h3><p style="margin:0">${esc(o.customer.name)}<br><span style="direction:ltr;display:inline-block">${esc(o.customer.phone)}</span><br>${esc(o.customer.email)}<br>${esc(o.customer.addr)}, ${esc(o.customer.city)} ${esc(o.customer.zip||'')}</p>${o.customer.note?`<p class="note-box" style="margin-top:10px">${esc(o.customer.note)}</p>`:''}</div>
+   <div class="panel"><h3>הודעות ללקוח</h3><p style="font-size:.86rem;color:var(--muted);margin-top:0">מעתיקים ושולחים במייל או בוואטסאפ.</p><div style="display:grid;gap:8px">${copyBox('אישור הזמנה ותשלום',TPL.confirm(o),'confirm')}${copyBox('עדכון משלוח ומספר מעקב',TPL.shipped(o),'shipped')}${copyBox('הודעה על עיכוב',TPL.delay(o),'delay')}${copyBox('אישור זיכוי',TPL.refund(o),'refund')}</div></div>
+   <div class="panel"><h3>כספים</h3><div class="sum"><span>שולם ע״י הלקוח</span><span>${money(o.total)}</span></div><div class="sum"><span>עלות ספק ${o.actualCost!==undefined&&o.actualCost!==''?'(בפועל)':'(משוערת)'}</span><span>−${money(cost)}</span></div><div class="sum"><span>עמלת סליקה משוערת</span><span>−${money(o.total*STORE.feePct/100)}</span></div>${o.refund?`<div class="sum"><span>זיכוי</span><span>−${money(+o.refund)}</span></div>`:''}<div class="sum tot"><span>רווח נקי משוער</span><span>${money(netOf(o)-cost-o.total*STORE.feePct/100)}</span></div></div>
+   <div class="panel"><h3>היסטוריה</h3>${(o.timeline||[{s:'new',t:o.t}]).map(e=>`<div class="sum" style="font-size:.88rem"><span>${(STAT[e.s]||STAT.new)[0]}</span><span>${dtstr(e.t)}</span></div>`).join('')}</div>
+  </div></div>`;
+}
+async function saveFulfill(status){
+  const v=id=>{const e=$('#'+id);return e?e.value.trim():undefined};
+  const patch={};const r=v('fRef'),c=v('fCost'),car=v('fCar'),trk=v('fTrk'),rf=v('fRefund');
+  if(r!==undefined)patch.supplierOrderRef=r.slice(0,40);
+  if(c!==undefined)patch.actualCost=c===''?'':Math.max(0,parseFloat(c)||0);
+  if(car!==undefined)patch.carrier=car.slice(0,40);
+  if(trk!==undefined)patch.tracking=trk.replace(/[^\w\-]/g,'').slice(0,60);
+  if(rf!==undefined)patch.refund=rf===''?0:Math.max(0,parseFloat(rf)||0);
+  if(status==='shipped'&&!patch.tracking){toast('נא להזין מספר מעקב לפני סימון כנשלח');return}
+  if(status==='refunded'&&!patch.refund){toast('נא להזין סכום זיכוי');return}
+  if(status==='paid'&&bizMissing().length){toast('קודם ממלאים בהגדרות: '+bizMissing().join(', '));return}
+  const pm=status==='paid'&&$('#fPay')?$('#fPay').value:'';if(pm)patch.payMethod=pm;
+  try{await updateOrder(FOCUS,patch,status||null);toast(status?'הסטטוס עודכן':'נשמר');renderAdmin()}catch(e){toast('שגיאה בשמירה');return}
+  if(status==='paid'){const o=ORDERS.find(x=>x.id===FOCUS);try{const r=await issueReceipt(o,pm);toast(`${docTitle(r)} ${rcNo(r.no)} הופקה. מגבה לדרייב...`);renderAdmin();await runBackup(r)}catch(e){toast('הפקת הקבלה נכשלה. אפשר לנסות שוב מעמוד ההזמנה');renderAdmin()}}
+}
+function imCalc(){
+  const c=parseFloat(($('#imCost')||{}).value)||0,s=parseFloat(($('#imShip')||{}).value)||0,box=$('#imCalc');if(!box)return;
+  if(!c){box.textContent='הזינו מחיר ספק כדי לקבל תמחור מומלץ.';return}
+  const ils=(c+s)*STORE.usdRate,sug=suggestPrice(ils),pr=parseFloat($('#imPrice').value)||sug,fee=pr*STORE.feePct/100,pf=pr-ils-fee;
+  box.innerHTML=`עלות כוללת: <b>${money(ils)}</b> · מחיר מומלץ: <b>${money(sug)}</b><br>במחיר ${money(pr)}: עמלה ${money(fee)}, רווח <b style="color:${pf>0?'var(--ok)':'var(--bad)'}">${money(pf)}</b> (${pr?(pf/pr*100).toFixed(0):0}%)`;
+  $('#imPrice').placeholder=String(sug);
+}
+async function saveImport(){
+  const v=id=>($('#'+id).value||'').trim(),err=m=>{$('#imErr').textContent=m};
+  const url=safeUrl(v('imUrl'));let host='';try{host=new URL(url).hostname}catch(e){}
+  if(v('imUrl')&&!url)return err('הקישור לספק צריך להתחיל ב-https://');
+  const title=v('imTitle');if(title.length<2)return err('נא לתת שם למוצר');
+  const cu=parseFloat(v('imCost')),su=parseFloat(v('imShip'))||0;if(!(cu>0))return err('נא להזין מחיר ספק בדולרים');
+  const costIls=Math.round((cu+su)*STORE.usdRate*100)/100;
+  const price=parseFloat(v('imPrice'))||suggestPrice(costIls);if(!(price>0))return err('מחיר מכירה לא תקין');
+  const was=parseFloat(v('imWas'))||0,cat=v('imCat'),artBy={rings:'ring',necklaces:'pendant',bracelets:'bracelet',earrings:'hoop',sets:'set'};
+  const doc={title:title.slice(0,80),cat:CAT_NAME[cat]?cat:'rings',art:artBy[cat]||'ring',metal:['gold','silver','rose','black'].includes(v('imMetal'))?v('imMetal'):'gold',
+    mat:v('imMat').slice(0,80),desc:v('imDesc').slice(0,400),sizes:v('imSizes').split(',').map(x=>x.trim().slice(0,20)).filter(Boolean).slice(0,12),
+    price,was:was>price?was:0,cost:costIls,supplierUrl:url,supplierVariant:v('imVar').slice(0,120),supplierTitle:v('imSupTitle').slice(0,200),supplierCostUsd:cu,supplierShipUsd:su,feat:1,tag:'חדש',active:true,created:Date.now()};
+  const id='a'+uid().slice(0,9);const btn=$('#imForm button[type=submit]');btn.disabled=true;
+  try{
+    if(IM_FILES.length){
+      const media=await uploadMedia(IM_FILES,(i,n,f,extra)=>setProg('imProg',extra||`מעלה קובץ ${i} מתוך ${n}...`));
+      doc.media=media;const fi=media.find(x=>x.t==='img');doc.img=fi?fi.src:'';
+    }
+    await DB.collection('products').doc(id).set(doc);OVR[id]=doc;err('');IM_FILES=[];
+    const f=$('#imForm');if(f){f.reset();renderImPrev();const pr=$('#imProg');if(pr)pr.textContent=''}
+    imCalc();toast('המוצר נוסף לחנות');renderAll();
+  }catch(e){const m=e&&e.message&&e.message.length>10?e.message:'שמירה נכשלה. נסו שוב.';err(m);setProg('imProg',m,true)}
+  finally{if(btn)btn.disabled=false}
+}
+async function saveSettings(){
+  const v=id=>($('#'+id).value||'').trim();
+  const x={heroId:STORE.heroId||'',heroCoupon:STORE.heroCoupon||'',usdRate:v('sRate'),feePct:v('sFee'),targetMargin:v('sMargin'),round9:$('#sRound').checked,freeShipFrom:v('sFree'),shipFee:v('sShipFee'),shipMin:v('sShipMin'),shipMax:v('sShipMax'),
+    paymentUrl:safeUrl(v('sPay')),paymentNote:v('sPayNote').slice(0,160),business:v('sBiz').slice(0,120),bizId:v('sBizId').replace(/[^\d-]/g,'').slice(0,20),bizType:v('sBizType')==='murshe'?'murshe':'patur',logo:STORE.logo||'',address:v('sAddr').slice(0,120),email:v('sMail').slice(0,120),phone:v('sPhone').slice(0,40)};
+  if(v('sPay')&&!x.paymentUrl){toast('קישור התשלום חייב להתחיל ב-https://');return}
+  try{await DB.doc('settings/store').set(x);applySettings(x);toast('ההגדרות נשמרו')}catch(e){toast('שמירה נכשלה')}
+}
+/* customer order tracking */
+async function openTracking(){
+  const mine=LS.get('lieto_my_orders',[]);let remote=[];
+  if(DB&&MYID){try{const s=await DB.doc('orders/'+MYID).get();if(s.exists&&Array.isArray(s.data().list))remote=s.data().list}catch(e){}}
+  const map={};mine.forEach(m=>map[m.id]=Object.assign({status:'new'},m));remote.forEach(o=>map[o.id]=o);
+  const list=Object.values(map).sort((a,b)=>b.t-a.t);
+  const CL={new:'התקבלה, ממתינה לתשלום',paid:'שולמה, בהכנה',ordered:'בטיפול אצל הספק',shipped:'בדרך אליך',delivered:'נמסרה',refunded:'זוכתה',cancel:'בוטלה'};
+  $('#dmSheet').innerHTML=`<button class="x" data-mclose aria-label="סגור">✕</button><div class="doc"><h2>מעקב הזמנה</h2>${list.length?list.map(o=>`<div class="panel" style="margin-top:14px"><div class="sum"><b style="direction:ltr">${esc(o.id)}</b><span>${dstr(o.t)}</span></div><p style="margin:6px 0">${esc(CL[o.status]||CL.new)} · ${money(o.total||0)}</p>${o.tracking?`<p style="margin:0">מספר מעקב: <b style="direction:ltr;display:inline-block">${esc(o.tracking)}</b> · <a href="${esc(trackUrl(o.tracking))}" target="_blank" rel="noopener noreferrer">איפה החבילה ↗</a></p>`:''}${o.status==='new'&&STORE.paymentUrl?`<a class="btn btn-ink btn-sm" style="margin-top:8px" href="${esc(STORE.paymentUrl)}" target="_blank" rel="noopener noreferrer">לתשלום</a>`:''}</div>`).join(''):`<p>לא נמצאו הזמנות מהמכשיר הזה. אם הזמנתם ממכשיר אחר, פנו אלינו עם מספר ההזמנה: ${esc(STORE.email)}</p>`}<p style="color:var(--muted);font-size:.88rem;margin-top:16px">זמן אספקה משוער: ${STORE.shipMin} עד ${STORE.shipMax} ימי עסקים מרגע התשלום.</p></div>`;
+  openModal('dm');
+}
+
+
+/* ---------- product media upload ---------- */
+const IMG_RX=/^image\/(jpeg|png|webp|gif|avif|heic|heif)$/i, VID_RX=/^video\/(mp4|webm|quicktime|x-m4v|3gpp)$/i;
+const EXT_TYPE={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif',avif:'image/avif',heic:'image/heic',heif:'image/heif',mp4:'video/mp4',m4v:'video/x-m4v',mov:'video/quicktime',webm:'video/webm','3gp':'video/3gpp'};
+const MAX_IMG=40*1024*1024, MAX_VID=20*1024*1024, MAX_VID_RAW=400*1024*1024;
+let IM_FILES=[], FOCUSP=null;
+const mb=n=>(n/1048576).toFixed(1)+'MB';
+function typeOf(f){const t=(f.type||'').toLowerCase();if(t&&t!=='application/octet-stream')return t;const ext=(f.name||'').split('.').pop().toLowerCase();return EXT_TYPE[ext]||''}
+const isImg=f=>IMG_RX.test(typeOf(f)), isVid=f=>VID_RX.test(typeOf(f)), isHeic=f=>/heic|heif/.test(typeOf(f));
+function checkFile(f){
+  if(isImg(f))return f.size>MAX_IMG?`התמונה "${f.name}" גדולה מדי (${mb(f.size)}, עד 40MB)`:'';
+  if(isVid(f))return f.size>MAX_VID_RAW?`הסרטון "${f.name}" גדול מדי (${mb(f.size)}). קצרו אותו לפחות מדקה ונסו שוב`:'';
+  return`הקובץ "${f.name}" אינו תמונה או סרטון שהאתר מכיר. אפשר להעלות JPG, PNG, WebP, HEIC, MP4 או MOV`;
+}
+function setProg(id,msg,bad){const el=$('#'+id);if(!el)return;el.textContent=msg||'';el.style.color=bad?'var(--bad)':''}
+function canvasBlob(c,type,q){return new Promise(r=>c.toBlob(b=>r(b),type,q))}
+async function loadBitmap(file){
+  try{return await createImageBitmap(file,{imageOrientation:'from-image'})}catch(e){}
+  return await new Promise((res,rej)=>{const u=URL.createObjectURL(file),i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),1000)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('decode'))};i.src=u});
+}
+let heicLib=null;
+function loadHeicLib(){
+  if(window.heic2any)return Promise.resolve(window.heic2any);
+  if(heicLib)return heicLib;
+  heicLib=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';sc.onload=()=>window.heic2any?res(window.heic2any):rej(new Error('lib'));sc.onerror=()=>{heicLib=null;rej(new Error('lib'))};document.head.appendChild(sc)});
+  return heicLib;
+}
+async function prepImage(file){
+  let bm;
+  try{bm=await loadBitmap(file)}catch(e){
+    if(!isHeic(file))throw e;
+    const h2a=await loadHeicLib();const out=await h2a({blob:file,toType:'image/jpeg',quality:0.9});
+    bm=await loadBitmap(Array.isArray(out)?out[0]:out);
+  }
+  const w=bm.width,h=bm.height,mx=1600,k=Math.min(1,mx/Math.max(w,h));
+  const c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);
+  const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(bm,0,0,c.width,c.height);
+  return await canvasBlob(c,'image/jpeg',0.86);
+}
+function videoPoster(file){
+  return new Promise(res=>{
+    const u=URL.createObjectURL(file),v=document.createElement('video');let done=false;
+    const fin=b=>{if(done)return;done=true;URL.revokeObjectURL(u);res(b)};
+    setTimeout(()=>fin(null),9000);
+    v.muted=true;v.playsInline=true;v.preload='auto';
+    v.onloadeddata=()=>{try{v.currentTime=Math.min(0.3,(v.duration||1)/3)}catch(e){fin(null)}};
+    v.onseeked=async()=>{try{const k=Math.min(1,900/Math.max(v.videoWidth,v.videoHeight));const c=document.createElement('canvas');c.width=Math.round(v.videoWidth*k);c.height=Math.round(v.videoHeight*k);c.getContext('2d').drawImage(v,0,0,c.width,c.height);fin(await canvasBlob(c,'image/jpeg',0.82))}catch(e){fin(null)}};
+    v.onerror=()=>fin(null);v.src=u;
+  });
+}
+/* re-encode a large video in the browser: 720p, ~2.5 Mbps, no sound */
+function compressVideo(file,onPct){
+  return new Promise((res,rej)=>{
+    if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){rej(new Error('הדפדפן הזה לא יודע לכווץ סרטונים. נסו בכרום במחשב, או כווצו את הסרטון לפני ההעלאה'));return}
+    const types=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+    const mime=types.find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}});
+    if(!mime){rej(new Error('הדפדפן הזה לא יודע לכווץ סרטונים'));return}
+    const u=URL.createObjectURL(file),v=document.createElement('video');
+    v.muted=true;v.playsInline=true;v.preload='auto';v.src=u;
+    v.style.cssText='position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0';document.body.appendChild(v);
+    const cleanup=()=>{try{v.pause()}catch(e){}v.remove();URL.revokeObjectURL(u)};
+    v.onerror=()=>{cleanup();rej(new Error('הסרטון לא נפתח בדפדפן. נסו לשמור אותו כ-MP4'))};
+    v.onloadedmetadata=()=>{
+      if(!(v.duration>0)||v.duration>90){cleanup();rej(new Error('הסרטון ארוך מדי לכיווץ באתר (עד 90 שניות). קצרו אותו ונסו שוב'));return}
+      const k=Math.min(1,720/Math.min(v.videoWidth,v.videoHeight));
+      const c=document.createElement('canvas');c.width=Math.round(v.videoWidth*k/2)*2;c.height=Math.round(v.videoHeight*k/2)*2;
+      const g=c.getContext('2d');const stream=c.captureStream(30);
+      const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000});const chunks=[];
+      rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+      rec.onstop=()=>{cleanup();const out=new Blob(chunks,{type:mime.split(';')[0]});out.size?res(out):rej(new Error('הכיווץ נכשל'))};
+      let raf;const draw=()=>{g.drawImage(v,0,0,c.width,c.height);onPct&&onPct(Math.min(99,Math.round(v.currentTime/v.duration*100)));if(!v.ended)raf=requestAnimationFrame(draw)};
+      v.onended=()=>{cancelAnimationFrame(raf);g.drawImage(v,0,0,c.width,c.height);setTimeout(()=>rec.stop(),150)};
+      rec.start(500);v.play().then(draw).catch(()=>{rec.stop();rej(new Error('לא ניתן היה להפעיל את הסרטון לכיווץ'))});
+    };
+  });
+}
+async function uploadMedia(files,onStep){
+  const as=await claude.use('assets');
+  if(!as)throw new Error('העלאת קבצים זמינה רק לבעל החנות כשהוא מחובר. פתחו את האתר מהחשבון שלכם ונסו שוב');
+  const out=[];let i=0;
+  const up=async(blob,type)=>{try{return await as.upload(blob,{type})}catch(e){const c=e&&e.code;throw new Error(c==='not_granted'?'לא אושרה הרשאה להעלאת קבצים. אשרו את ההרשאה ונסו שוב':c==='too_large'?'הקובץ גדול מדי לשרת':c==='rate_limited'?'הועלו הרבה קבצים ברצף. חכו דקה ונסו שוב':'ההעלאה לשרת נכשלה'+(c?' ('+c+')':'')+'. נסו שוב')}};
+  for(const f of files){
+    i++;
+    if(isImg(f)){
+      onStep&&onStep(i,files.length,f,'');
+      let blob;try{blob=await prepImage(f)}catch(e){throw new Error(isHeic(f)?`לא הצלחנו לפתוח את תמונת האייפון "${f.name}". שמרו אותה כ-JPG ונסו שוב`:`התמונה "${f.name}" לא נפתחה. ייתכן שהקובץ פגום`)}
+      const r=await up(blob,'image/jpeg');out.push({t:'img',src:r.url});
+    }else{
+      let vid=f,type=typeOf(f);
+      if(f.size>MAX_VID){
+        onStep&&onStep(i,files.length,f,'מכווץ סרטון גדול (0%)... השאירו את הדף פתוח');
+        vid=await compressVideo(f,pct=>onStep&&onStep(i,files.length,f,`מכווץ סרטון גדול (${pct}%)... השאירו את הדף פתוח`));
+        type=vid.type;
+        if(vid.size>MAX_VID)throw new Error(`גם אחרי כיווץ הסרטון "${f.name}" גדול מ-20MB. קצרו אותו ונסו שוב`);
+      }
+      onStep&&onStep(i,files.length,f,'');
+      const pb=await videoPoster(vid);let poster='';
+      if(pb){try{poster=(await up(pb,'image/jpeg')).url}catch(e){}}
+      const r=await up(vid,type==='video/x-m4v'||type==='video/3gpp'?'video/mp4':type);out.push({t:'video',src:r.url,poster});
+    }
+  }
+  return out;
+}
+function addImFiles(list){
+  const errs=[];Array.from(list||[]).forEach(f=>{const e=checkFile(f);if(e)errs.push(e);else if(IM_FILES.length<8)IM_FILES.push(f)});
+  setProg('imProg',errs[0]||'',!!errs.length);renderImPrev();
+}
+function renderImPrev(){
+  const box=$('#imPrev');if(!box)return;
+  $$('img,video',box).forEach(x=>{if(x.src.startsWith('blob:'))URL.revokeObjectURL(x.src)});
+  box.innerHTML=IM_FILES.map((f,i)=>{const u=URL.createObjectURL(f),v=isVid(f),big=v&&f.size>MAX_VID,heic=isHeic(f);
+    return`<div class="prev-i">${v?`<video src="${u}" muted playsinline preload="metadata"></video><span class="k">${big?'יכווץ':'סרטון'}</span>`:heic?'<span class="noposter" style="background:var(--stone)"></span><span class="k">HEIC</span>':`<img src="${u}" alt="">`}${i===0&&!v?'<span class="k">ראשית</span>':''}<button type="button" data-imrm="${i}" aria-label="הסרת ${esc(f.name)}">✕</button></div>`}).join('');
+}
+function getProd(id){return Object.assign({id},PRODUCTS.find(x=>x.id===id)||{},OVR[id]||{})}
+async function saveMediaList(id,list){
+  const cur=Object.assign({},OVR[id]||{});delete cur.video;delete cur.videos;
+  const firstImg=list.find(x=>x.t==='img');
+  const doc=Object.assign(cur,{media:list,img:firstImg?firstImg.src:''});
+  await DB.collection('products').doc(id).set(doc);OVR[id]=doc;renderAll();
+}
+function renderMediaMgr(B,notice){
+  const p=getProd(FOCUSP);if(!FOCUSP){admTab='products';renderAdmin();return}
+  const list=mediaOf(p),mi=list.findIndex(x=>x.t==='img');
+  B.innerHTML=notice+`<div class="ctrls"><button class="btn btn-line btn-sm" data-mback>→ חזרה למוצרים</button><h2 style="font-size:1.5rem">${esc(p.title||'')}</h2><span style="color:var(--muted)">${list.length} קבצים</span></div>
+  <div class="note-box">הסדר כאן הוא הסדר בגלריה של המוצר, והתמונה הראשונה ברשימה מוצגת בכרטיס המוצר בחנות. תמונות מוקטנות ומתוקנות אוטומטית (סיבוב, גודל ומשקל) לפני ההעלאה. סרטונים גדולים מ-20MB מכווצים אוטומטית בדפדפן (עד 90 שניות). מומלץ 5 עד 15 שניות.</div>
+  <div class="panel"><label class="drop" id="mmDrop" for="mmFiles"><b>הוספת תמונות וסרטונים</b><small>לחצו לבחירה, גררו קבצים לכאן או הדביקו תמונה שהעתקתם (Ctrl+V) · JPG, PNG, WebP, MP4, MOV</small></label>
+   <input type="file" id="mmFiles" multiple accept="image/*,.heic,.heif,video/*,.mov,.mp4" class="sr">
+   <div class="prog" id="mmProg" role="status" aria-live="polite"></div></div>
+  <div class="panel">${list.length?`<div class="mgrid">${list.map((m,i)=>`<div class="mitem${i===mi?' main':''}"><div class="mth">${m.t==='video'?`<video src="${esc(m.src)}" ${okSrc(m.poster)?`poster="${esc(m.poster)}"`:''} muted loop playsinline controls preload="metadata"></video>`:`<img src="${esc(m.src)}" alt="" loading="lazy">`}<span class="k">${i===mi?'תמונה ראשית':m.t==='video'?'סרטון':'תמונה'}</span></div>
+     <div class="mbtns"><button data-mmv="${i}:-1" ${i===0?'disabled':''} aria-label="הזזה קדימה">→</button><button data-mmv="${i}:1" ${i===list.length-1?'disabled':''} aria-label="הזזה אחורה">←</button>${m.t==='img'&&i!==mi?`<button data-mmain="${i}">לראשית</button>`:''}<button data-mdel="${i}" style="color:var(--bad)">מחיקה</button></div></div>`).join('')}</div>`:'<div class="empty">אין עדיין תמונות או סרטונים למוצר הזה. בינתיים מוצג איור.</div>'}</div>`;
+}
+async function mmUpload(files){
+  const arr=Array.from(files||[]);if(!arr.length||!FOCUSP)return;
+  for(const f of arr){const e=checkFile(f);if(e){setProg('mmProg',e,true);return}}
+  const prog=$('#mmProg');if(prog)prog.style.color='';
+  try{
+    const added=await uploadMedia(arr,(i,n,f,extra)=>setProg('mmProg',extra||`מעלה ${i} מתוך ${n}...`));
+    const list=mediaOf(getProd(FOCUSP)).concat(added).slice(0,12);
+    await saveMediaList(FOCUSP,list);toast('הקבצים נוספו');renderAdmin();
+  }catch(e){setProg('mmProg',e&&e.message&&e.message.length>10?e.message:'ההעלאה נכשלה. נסו שוב',true)}
+}
+
+
+/* ---------- receipts (PDF + Google Drive backup) ---------- */
+let RECEIPTS=[], DRIVE={folderId:'',folderUrl:''};
+const PAY_METHODS=['כרטיס אשראי','Bit','PayBox','PayPal','העברה בנקאית','מזומן'];
+const VAT=18;
+const rcNo=n=>String(n).padStart(5,'0');
+const docTitle=r=>r.bizType==='murshe'?'חשבונית מס / קבלה':'קבלה';
+function loadScript(src,globalName){return new Promise((res,rej)=>{if(window[globalName])return res(window[globalName]);const sc=document.createElement('script');sc.src=src;sc.onload=()=>window[globalName]?res(window[globalName]):rej(new Error('lib'));sc.onerror=()=>rej(new Error('lib'));document.head.appendChild(sc)})}
+async function pdfLibs(){
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
+  return{h2c:window.html2canvas,jsPDF:window.jspdf.jsPDF};
+}
+function receiptHtml(r,copy){
+  const c=r.customer||{},murshe=r.bizType==='murshe',net=Math.round(r.total/(1+VAT/100)*100)/100,vat=Math.round((r.total-net)*100)/100;
+  const logo=okSrc(r.logo)?`<img src="${esc(r.logo)}" alt="" class="rc-logo">`:`<div class="rc-word">LIETO</div>`;
+  return`<div class="rc${r.status==='void'?' void':''}">
+  <div class="rc-top">${logo}<div class="rc-biz"><b>${esc(r.business||'')}</b><span>${murshe?'עוסק מורשה':'עוסק פטור'} מס׳ ${esc(r.bizId||'')}</span><span>${esc(r.address||'')}</span><span dir="ltr">${esc(r.phone||'')}${r.email?' · '+esc(r.email):''}</span></div></div>
+  <div class="rc-head"><h1>${docTitle(r)} מס׳ <span dir="ltr">${rcNo(r.no)}</span></h1><span class="rc-tag">${r.status==='void'?'מבוטלת':copy?'העתק נאמן למקור':'מקור'}</span></div>
+  <div class="rc-meta"><div><small>תאריך</small><b>${new Date(r.t).toLocaleDateString('he-IL')}</b></div><div><small>מספר הזמנה</small><b dir="ltr">${esc(r.orderId)}</b></div><div class="wide"><small>לכבוד</small><b>${esc(c.name||'')}</b><span>${esc(c.addr||'')}${c.city?', '+esc(c.city):''} ${esc(c.zip||'')}</span><span dir="ltr">${esc(c.phone||'')}${c.email?' · '+esc(c.email):''}</span></div></div>
+  <table class="rc-t"><thead><tr><th>תיאור</th><th>כמות</th><th>מחיר ליחידה</th><th>סה״כ</th></tr></thead><tbody>
+  ${(r.items||[]).map(i=>`<tr><td>${esc(i.title)}${i.size?` <small>(${esc(i.size)})</small>`:''}</td><td>${i.q}</td><td>${money(i.price)}</td><td>${money(i.price*i.q)}</td></tr>`).join('')}
+  ${r.shipping?`<tr><td>משלוח</td><td>1</td><td>${money(r.shipping)}</td><td>${money(r.shipping)}</td></tr>`:''}
+  ${r.discount?`<tr><td>הנחה${r.coupon?` · קוד <span dir="ltr">${esc(r.coupon)}</span>`:''}</td><td></td><td></td><td>−${money(r.discount)}</td></tr>`:''}
+  </tbody></table>
+  <div class="rc-sum">${murshe?`<div><span>סה״כ לפני מע״מ</span><span>${money(net)}</span></div><div><span>מע״מ ${VAT}%</span><span>${money(vat)}</span></div>`:''}<div class="tot"><span>סה״כ שולם</span><span>${money(r.total)}</span></div>${murshe?'':'<p>עוסק פטור, המחיר אינו כולל מע״מ.</p>'}</div>
+  <table class="rc-t rc-pay"><thead><tr><th>אמצעי תשלום</th><th>תאריך תשלום</th><th>סכום</th></tr></thead><tbody><tr><td>${esc(r.payMethod||'')}</td><td>${new Date(r.paidAt||r.t).toLocaleDateString('he-IL')}</td><td>${money(r.total)}</td></tr></tbody></table>
+  ${r.status==='void'?`<p class="rc-void">המסמך בוטל בתאריך ${new Date(r.voidAt||Date.now()).toLocaleDateString('he-IL')}${r.voidReason?': '+esc(r.voidReason):''}</p>`:''}
+  <div class="rc-foot"><span>מסמך ממוחשב · ${esc(r.business||'LIETO')}</span><span>תודה שקניתם ב-LIETO</span></div>
+  </div>`;
+}
+async function receiptPdf(r,copy){
+  const {h2c,jsPDF}=await pdfLibs();
+  const host=document.createElement('div');host.className='rc-host';host.innerHTML=receiptHtml(r,copy);document.body.appendChild(host);
+  try{
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    const im=host.querySelector('img');if(im&&!im.complete)await new Promise(ok=>{im.onload=im.onerror=ok});
+    const canvas=await h2c(host.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
+    const pdf=new jsPDF({unit:'mm',format:'a4',orientation:'portrait',compress:true});
+    pdf.setProperties({title:`${docTitle(r)} ${rcNo(r.no)}`,author:r.business||'LIETO',creator:'LIETO'});
+    pdf.addImage(canvas.toDataURL('image/jpeg',0.92),'JPEG',0,0,210,297);
+    return pdf.output('blob');
+  }finally{host.remove()}
+}
+const blobB64=b=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.onerror=rej;fr.readAsDataURL(b)});
+const rcFile=r=>`${docTitle(r).replace(/[\/ ]+/g,'-')}-${rcNo(r.no)}-${r.orderId}${r.status==='void'?'-מבוטלת':''}.pdf`;
+function driveErr(e){const c=e&&e.code;return c==='server_not_connected'?'Google Drive לא מחובר. הוסיפו אותו ב-claude.ai ← הגדרות ← Connectors':c==='needs_reauth'?'החיבור ל-Google Drive פג. חברו אותו מחדש ב-claude.ai ← הגדרות ← Connectors':c==='approval_required'||c==='not_in_manifest'?'צריך לאשר לאתר גישה ל-Google Drive. לחצו שוב ואשרו':c==='blocked_by_policy'?'הארגון חוסם גישה ל-Google Drive':'הגיבוי לדרייב נכשל'+(c?' ('+c+')':'')+'. נסו שוב'}
+async function ensureFolder(mcp){
+  if(DRIVE.folderId)return DRIVE.folderId;
+  const r=await mcp.callTool('Google Drive','create_file',{title:'LIETO – קבלות',contentMimeType:'application/vnd.google-apps.folder'});
+  const pl=r&&r.payload||{};if(!pl.id)throw{code:'upstream_error'};
+  DRIVE={folderId:pl.id,folderUrl:pl.viewUrl||''};await DB.doc('private/drive').set(DRIVE);return pl.id;
+}
+async function backupReceipt(r){
+  const mcp=await claude.use('mcp');if(!mcp)throw{code:'server_not_connected'};
+  const folder=await ensureFolder(mcp);
+  const blob=await receiptPdf(r,false);
+  const res=await mcp.callTool('Google Drive','create_file',{title:rcFile(r),parentId:folder,base64Content:await blobB64(blob),contentMimeType:'application/pdf',disableConversionToGoogleType:true});
+  const pl=res&&res.payload||{};
+  const patch={driveId:pl.id||'',driveUrl:pl.viewUrl||'',backedAt:Date.now(),backedStatus:r.status};
+  await DB.doc('receipts/'+rcNo(r.no)).set(Object.assign({},r,patch));Object.assign(r,patch);return r;
+}
+async function issueReceipt(o,payMethod){
+  const existing=RECEIPTS.find(x=>x.orderId===o.id&&x.status!=='void');if(existing)return existing;
+  const cref=DB.doc('private/counter'),cs=await cref.get();const no=(cs.exists&&+cs.data().next)||1;
+  const r={no,orderId:o.id,t:Date.now(),paidAt:Date.now(),payMethod:payMethod||'כרטיס אשראי',status:'issued',
+    customer:o.customer,items:o.items.map(i=>({title:i.title,size:i.size||'',q:i.q,price:i.price})),subtotal:o.subtotal,discount:o.discount||0,coupon:o.coupon||'',shipping:o.shipping||0,total:o.total,
+    business:STORE.business,bizId:STORE.bizId||'',bizType:STORE.bizType||'patur',address:STORE.address,phone:STORE.phone,email:STORE.email,logo:STORE.logo||''};
+  await cref.set({next:no+1});await DB.doc('receipts/'+rcNo(no)).set(r);RECEIPTS.push(r);
+  try{await updateOrder(o.id,{receiptNo:no})}catch(e){}
+  return r;
+}
+async function downloadReceipt(r){
+  const dl=await claude.use('downloads');if(!dl){toast('הורדה אינה זמינה בתצוגה הזו');return}
+  toast('מכין PDF...');const blob=await receiptPdf(r,true);
+  try{await dl.save({filename:rcFile(r),data:blob})}catch(e){if(e&&e.code!=='declined')toast('ההורדה לא הושלמה')}
+}
+async function runBackup(r,btn){
+  if(btn)btn.disabled=true;toast('מגבה לדרייב...');
+  try{await backupReceipt(r);toast(`${docTitle(r)} ${rcNo(r.no)} נשמרה בדרייב`)}catch(e){toast(driveErr(e))}
+  finally{if(btn)btn.disabled=false;renderAdmin()}
+}
+function bizMissing(){const m=[];if(!STORE.bizId)m.push('מספר עוסק');if(!STORE.business||/^\[/.test(STORE.business))m.push('שם העסק');if(!STORE.address||/^\[/.test(STORE.address))m.push('כתובת');return m}
+function renderReceipts(B,notice){
+  const miss=bizMissing(),list=RECEIPTS.slice().sort((a,b)=>b.no-a.no),pend=list.filter(r=>!r.driveId||r.backedStatus!==r.status);
+  B.innerHTML=notice+`${miss.length?`<div class="note-box" style="border-color:var(--warn);color:var(--ink)">לפני הפקת קבלות צריך למלא בהגדרות (לשונית דרופשיפינג): <b>${miss.join(', ')}</b>.</div>`:''}
+  <div class="kpis"><div class="kpi"><span>קבלות שהופקו</span><b>${list.filter(r=>r.status!=='void').length}</b><small>${list.filter(r=>r.status==='void').length} מבוטלות</small></div>
+  <div class="kpi"><span>סכום הקבלות</span><b>${money(list.filter(r=>r.status!=='void').reduce((a,r)=>a+r.total,0))}</b></div>
+  <div class="kpi"><span>גיבוי ב-Google Drive</span><b style="color:${pend.length?'var(--warn)':'var(--ok)'}">${list.length-pend.length}/${list.length}</b><small>${DRIVE.folderUrl?`<a href="${esc(DRIVE.folderUrl)}" target="_blank" rel="noopener noreferrer">פתיחת התיקייה בדרייב ↗</a>`:'התיקייה תיווצר בגיבוי הראשון'}</small></div></div>
+  <div class="ctrls"><button class="btn btn-ink btn-sm" id="rcAll" ${pend.length?'':'disabled'}>גיבוי ${pend.length||''} קבלות לדרייב</button><span style="color:var(--muted);font-size:.86rem">כל קבלה חדשה נשמרת בדרייב אוטומטית ברגע שמסמנים הזמנה כשולמה.</span></div>
+  <div class="panel">${list.length?`<div class="tblwrap"><table><thead><tr><th>מס׳</th><th>תאריך</th><th>הזמנה</th><th>לקוח</th><th>סכום</th><th>תשלום</th><th>סטטוס</th><th>דרייב</th><th></th></tr></thead><tbody>${list.map(r=>`<tr data-rc="${r.no}"><td class="n"><b>${rcNo(r.no)}</b></td><td class="n">${dstr(r.t)}</td><td class="n"><button class="lnk" data-ful="${esc(r.orderId)}">${esc(r.orderId)}</button></td><td>${esc((r.customer||{}).name||'')}</td><td class="n">${money(r.total)}</td><td>${esc(r.payMethod)}</td><td>${r.status==='void'?'<span class="pill cancel">מבוטלת</span>':'<span class="pill paid">תקפה</span>'}</td><td>${r.driveId&&r.backedStatus===r.status?`<a href="${esc(r.driveUrl||DRIVE.folderUrl||'#')}" target="_blank" rel="noopener noreferrer" style="color:var(--ok)">✓ בדרייב</a>`:`<button class="btn btn-line btn-sm" data-rcup="${r.no}">גיבוי</button>`}</td><td style="white-space:nowrap"><button class="btn btn-line btn-sm" data-rcdl="${r.no}">PDF</button> ${r.status==='void'?'':`<button class="btn btn-line btn-sm" data-rcvoid="${r.no}" style="color:var(--bad)">ביטול</button>`}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">עוד לא הופקו קבלות. קבלה נוצרת כשמסמנים הזמנה כ"שולמה" בעמוד הטיפול בהזמנה.</div>'}
+  <div id="rcVoidBox" hidden class="note-box" style="margin-top:12px"><label class="l">סיבת הביטול<input class="field" id="rcVoidWhy" maxlength="120" placeholder="לדוגמה: ביטול עסקה וזיכוי ללקוח"></label><div class="ctrls" style="margin:10px 0 0"><button class="btn btn-ink btn-sm" id="rcVoidGo">ביטול הקבלה</button><button class="btn btn-line btn-sm" id="rcVoidNo">חזרה</button><span style="font-size:.84rem">קבלה מבוטלת נשארת ברשימה ובדרייב עם סימון "מבוטלת". מספרי קבלות לא נמחקים ולא נעשה בהם שימוש חוזר.</span></div></div></div>`;
+}
+let RC_VOID=null;
+
+async function openAdmin(){
+  closeAll();const a=$('#adm');
+  if(!IS_ADMIN){a.innerHTML=`<div class="lockbox"><h2>אזור מוגבל</h2><p style="color:var(--muted)">ממשק הניהול זמין לבעל החנות בלבד, לאחר התחברות לחשבון.</p><button class="btn btn-ink" id="admX" style="justify-content:center">חזרה לחנות</button></div>`}
+  else adminShell();
+  a.classList.add('on');document.body.style.overflow='hidden';a.scrollTop=0;
+}
+function closeAdmin(){$('#adm').classList.remove('on');document.body.style.overflow=''}
+
+async function saveProducts(){
+  const msg=$('#saveMsg');msg.textContent='שומר...';
+  try{
+    for(const tr of $$('#admB tr[data-pid]')){
+      const id=tr.dataset.pid,get=f=>$('[data-f="'+f+'"]',tr);
+      const num=f=>{const n=parseFloat(get(f).value);return isFinite(n)&&n>=0?n:0};
+      const su=get('supplierUrl').value.trim();
+      const patch={price:num('price'),was:num('was'),cost:num('cost'),supplierUrl:su&&safeUrl(su)?safeUrl(su):'',supplierVariant:(get('supplierVariant').value||'').trim().slice(0,120),supplierTitle:(get('supplierTitle').value||'').trim().slice(0,200),active:get('active').checked};
+      const cur=OVR[id]||{};
+      if(JSON.stringify(Object.assign({},cur,patch))!==JSON.stringify(cur)){await DB.collection('products').doc(id).set(Object.assign({},cur,patch));OVR[id]=Object.assign({},cur,patch)}
+    }
+    msg.textContent='נשמר';renderAll();
+  }catch(e){msg.textContent='שגיאה בשמירה'}
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('button,a,summary,[data-doc]');if(!t)return;
+  const d=t.dataset||{};
+  if(d.doc){e.preventDefault();openDoc(d.doc);return}
+  if(d.cat){state.cat=d.cat;renderCats();renderGrid();$('#collection').scrollIntoView();return}
+  if(d.chip){state.cat=d.chip;renderCats();renderGrid();return}
+  if(d.hero){try{const ref=DB.doc('settings/store'),sn=await ref.get();const cur=sn.exists?sn.data():{};await ref.set(Object.assign({},cur,{heroId:d.hero}));STORE.heroId=d.hero;renderAll();renderAdmin();toast('המוצר מוצג עכשיו בתמונת הדגל')}catch(x){toast('שמירה נכשלה')}return}
+  if(d.rcdl){const r=RECEIPTS.find(x=>x.no===+d.rcdl);if(r)downloadReceipt(r).catch(()=>toast('יצירת ה-PDF נכשלה. בדקו את החיבור לאינטרנט ונסו שוב'));return}
+  if(d.rcup){const r=RECEIPTS.find(x=>x.no===+d.rcup);if(r)runBackup(r,t);return}
+  if(d.rcmake){if(bizMissing().length){toast('קודם ממלאים בהגדרות: '+bizMissing().join(', '));return}const o=ORDERS.find(x=>x.id===d.rcmake);if(!o)return;try{const r=await issueReceipt(o,o.payMethod);renderAdmin();await runBackup(r)}catch(e){toast('הפקת הקבלה נכשלה')}return}
+  if(d.rcvoid){RC_VOID=+d.rcvoid;const bx=$('#rcVoidBox');if(bx){bx.hidden=false;$('#rcVoidWhy').focus()}return}
+  if(t.id==='rcVoidNo'){RC_VOID=null;$('#rcVoidBox').hidden=true;return}
+  if(t.id==='rcVoidGo'){const r=RECEIPTS.find(x=>x.no===RC_VOID);if(!r)return;Object.assign(r,{status:'void',voidAt:Date.now(),voidReason:($('#rcVoidWhy').value||'').trim().slice(0,120)});try{await DB.doc('receipts/'+rcNo(r.no)).set(r);RC_VOID=null;renderAdmin();await runBackup(r)}catch(e){toast('הביטול נכשל')}return}
+  if(t.id==='rcAll'){const pend=RECEIPTS.filter(r=>!r.driveId||r.backedStatus!==r.status);t.disabled=true;let ok=0;for(const r of pend){try{await backupReceipt(r);ok++;toast(`גובו ${ok} מתוך ${pend.length}`)}catch(e){toast(driveErr(e));break}}renderAdmin();return}
+  if(t.id==='vhToggle'){const v=$('#vhVideo');if(v.paused){v.dataset.userPaused='';v.play();t.textContent='❚❚';t.setAttribute('aria-label','השהיית הסרטון')}else{v.dataset.userPaused='1';v.pause();t.textContent='▶';t.setAttribute('aria-label','הפעלת הסרטון')}return}
+  if(d.gi!==undefined){showMedia(+d.gi);return}
+  if(d.imrm!==undefined){IM_FILES.splice(+d.imrm,1);renderImPrev();return}
+  if(d.mm){FOCUSP=d.mm;admTab='media';renderAdmin();$('#adm').scrollTop=0;return}
+  if(d.mback!==undefined){FOCUSP=null;admTab='products';renderAdmin();return}
+  if(d.mmv||d.mdel!==undefined||d.mmain!==undefined){
+    const list=mediaOf(getProd(FOCUSP)).slice();
+    if(d.mmv){const[i,dir]=d.mmv.split(':').map(Number),j=i+dir;if(j<0||j>=list.length)return;[list[i],list[j]]=[list[j],list[i]]}
+    else if(d.mdel!==undefined)list.splice(+d.mdel,1);
+    else{const[x]=list.splice(+d.mmain,1);list.unshift(x)}
+    try{await saveMediaList(FOCUSP,list);renderAdmin()}catch(x){toast('שמירה נכשלה')}
+    return}
+  if(d.vt!==undefined){const v=$('#galStage video');if(v){if(v.paused){v.play();t.textContent='❚❚';t.setAttribute('aria-label','השהיית הסרטון')}else{v.pause();t.textContent='▶';t.setAttribute('aria-label','הפעלת הסרטון')}}return}
+  if(d.open){if(d.promo&&couponLive(d.promo)&&state.coupon!==d.promo){state.coupon=d.promo;saveCart();renderCart();toast('ההנחה נכנסה לעגלה ✓')}openProduct(d.open);return}
+  if(d.quick){const qp=byId(d.quick);if(qp&&((qp.sizes&&qp.sizes.length>1)||(Array.isArray(qp.finishes)&&qp.finishes.length>1))){openProduct(d.quick);return}addToCart(d.quick);return}
+  if(d.wish){const i=state.wish.indexOf(d.wish);if(i<0){state.wish.push(d.wish);toast('נשמר במועדפים')}else state.wish.splice(i,1);LS.set('lieto_wish',state.wish);renderGrid();renderWish();badges();if(t.closest('#pmSheet'))openProduct(d.wish);return}
+  if(d.inc!==undefined){const l=state.cart[+d.inc];if(l){l.q=Math.min(9,l.q+1);saveCart();renderCart();badges()}return}
+  if(d.dec!==undefined){const l=state.cart[+d.dec];if(l){l.q--;if(l.q<1)state.cart.splice(+d.dec,1);saveCart();renderCart();badges()}return}
+  if(d.rm!==undefined){state.cart.splice(+d.rm,1);saveCart();renderCart();badges();return}
+  if(d.close!==undefined||d.mclose!==undefined){closeAll();return}
+  if(t.id==='cpnBtn'){const c=($('#cpn').value||'').trim().toUpperCase();if(!c){state.coupon='';saveCart();renderCart();return}if(COUPONS[c]&&!couponLive(c)){toast('תוקף הקוד הסתיים');return}if(COUPONS[c]){state.coupon=c;saveCart();renderCart();toast('הקופון הוחל')}else toast('קוד קופון לא תקין');return}
+  if(t.id==='goCo'){openCheckout();return}
+  if(t.id==='btnCart'){openDrawer('cart');return}
+  if(t.id==='btnWish'){openDrawer('wishD');return}
+  if(t.id==='btnSearch'){$('#collection').scrollIntoView();setTimeout(()=>$('#q').focus(),400);return}
+  if(t.id==='burger'){$('#mnav').classList.add('on');return}
+  if(t.id==='mclose'||t.closest('#mnav a')){$('#mnav').classList.remove('on');return}
+  if(t.id==='btnAdmin'){openAdmin();return}
+  if(t.id==='admX'){closeAdmin();return}
+  if(d.tab){admTab=d.tab;FOCUS=null;renderAdmin();return}
+  if(d.ful){FOCUS=d.ful;admTab='fulfill';renderAdmin();$('#adm').scrollTop=0;return}
+  if(d.back!==undefined){FOCUS=null;admTab='drop';renderAdmin();return}
+  if(d.ost!==undefined){saveFulfill(d.ost);return}
+  if(d.copy){const o=ORDERS.find(x=>x.id===FOCUS);if(!o)return;const txt=d.copy==='addr'?addrBlock(o):TPL[d.copy](o);copyText(txt,t);return}
+  if(t.id==='btnTrack'||d.track!==undefined){e.preventDefault();closeAll();openTracking();return}
+  if(t.id==='saveProd'){saveProducts();return}
+  if(t.id==='exp'){try{const dl=await claude.use('downloads');if(!dl){toast('ייצוא אינו זמין בתצוגה הזו');return}await dl.save({filename:'lieto-orders-'+new Date().toISOString().slice(0,10)+'.csv',data:new Blob([csvOrders()],{type:'text/csv;charset=utf-8'})})}catch(x){toast('הייצוא בוטל')}return}
+  if(d.saveo!==undefined){const tr=t.closest('tr'),id=tr.dataset.oid;try{const o=ORDERS.find(x=>x.id===id);const ref=DB.doc('orders/'+o._owner);const s=await ref.get();const list=s.data().list;const it=list.find(x=>x.id===id);it.status=$('[data-st]',tr).value;it.supplierOrderRef=$('[data-ref]',tr).value.slice(0,80);it.tracking=$('[data-trk]',tr).value.slice(0,60);await ref.set({list});toast('ההזמנה עודכנה')}catch(x){toast('שגיאה בעדכון')}return}
+  if(d.a){a11y(d.a,t);return}
+  if(t.id==='a11yBtn'){const p=$('#a11yP');const on=p.classList.toggle('on');t.setAttribute('aria-expanded',String(on));return}
+  if(t.id==='cookieOk'){LS.set('lieto_cookie',1);$('#cookie').classList.remove('on');return}
+});
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.id==='sort'){state.sort=t.value;renderGrid()}
+  if(t.id==='rng'){admRange=+t.value;renderAdmin()}
+  if(t.id==='ast'){admStatus=t.value;renderAdmin()}
+  if(t.id==='sLogo'&&t.files&&t.files[0]){const f=t.files[0];if(!/^image\/(png|jpeg|webp)$/.test(f.type)){toast('הלוגו צריך להיות PNG, JPG או WebP');return}
+    try{const as=await claude.use('assets');if(!as){toast('העלאה אינה זמינה');return}const bm=await loadBitmap(f);const k=Math.min(1,600/Math.max(bm.width,bm.height));const c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);const b=await canvasBlob(c,'image/png');const r=await as.upload(b,{type:'image/png'});
+      const ref=DB.doc('settings/store'),sn=await ref.get();await ref.set(Object.assign({},sn.exists?sn.data():{},{logo:r.url}));STORE.logo=r.url;toast('הלוגו נשמר');renderAdmin()}catch(x){toast('העלאת הלוגו נכשלה')}return}
+  if(t.id==='imMedia'){addImFiles(t.files);t.value='';return}
+  if(t.id==='mmFiles'){const fl=Array.from(t.files||[]);t.value='';mmUpload(fl);return}
+  if(t.matches&&t.matches('[data-vid]')&&t.files&&t.files[0]){
+    const f=t.files[0],id=t.closest('tr').dataset.pid;
+    if(!/^video\/(mp4|webm|quicktime)$/.test(f.type)){toast('הקובץ צריך להיות סרטון MP4, MOV או WebM');return}
+    if(f.size>20*1024*1024){toast('הסרטון גדול מ-20MB. יש לכווץ אותו קודם');return}
+    toast('מעלה סרטון...');
+    try{const as=await claude.use('assets');if(!as){toast('העלאת סרטונים אינה זמינה');return}const r=await as.upload(f);const nd=Object.assign({},OVR[id]||{},{video:r.url});await DB.collection('products').doc(id).set(nd);OVR[id]=nd;toast('הסרטון עודכן');renderAll();renderAdmin()}catch(x){toast('ההעלאה נכשלה')}
+  }
+  if(t.matches&&t.matches('[data-img]')&&t.files&&t.files[0]){
+    const f=t.files[0],tr=t.closest('tr'),id=tr.dataset.pid;
+    if(!/^image\/(png|jpe?g|webp|gif)$/.test(f.type)||f.size>5*1024*1024){toast('קובץ תמונה לא תקין (עד 5MB)');return}
+    try{const as=await claude.use('assets');if(!as){toast('העלאת תמונות אינה זמינה');return}const r=await as.upload(f);await DB.collection('products').doc(id).set(Object.assign({},OVR[id]||{},{img:r.url}));OVR[id]=Object.assign({},OVR[id]||{},{img:r.url});toast('התמונה עודכנה');renderAll()}catch(x){toast('ההעלאה נכשלה')}
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='q'){state.q=e.target.value.trim();renderGrid()}
+  if(['imCost','imShip','imPrice'].includes(e.target.id))imCalc();
+  if(e.target.id==='aq'){admQ=e.target.value;const p=e.target.selectionStart;renderAdmin();const n=$('#aq');n.focus();n.setSelectionRange(p,p)}
+});
+document.addEventListener('submit',async e=>{
+  if(e.target.id==='newsForm'){e.preventDefault();const m=$('#newsMail').value.trim();
+    if(!rxMail.test(m)){$('#newsErr').textContent='כתובת אימייל לא תקינה';return}
+    if(!$('#newsOk').checked){$('#newsErr').textContent='יש לאשר קבלת דיוור כדי להצטרף';return}
+    $('#newsErr').textContent='';
+    if(DB&&MYID){try{await DB.doc('subscribers/'+MYID).set({email:m,t:Date.now()})}catch(x){}}
+    toast('הקוד שלכם: LIETO10, והוא כבר בעגלה');e.target.reset();state.coupon='LIETO10';saveCart();renderCart()}
+  if(e.target.id==='imForm'){e.preventDefault();saveImport();return}
+  if(e.target.id==='setForm'){e.preventDefault();saveSettings();return}
+  if(e.target.id==='cpnForm'){e.preventDefault();const c=$('#nc').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,''),v=Math.min(90,Math.max(1,parseInt($('#nv').value,10)||0));
+    if(!c||!v){toast('נא למלא קוד ואחוז הנחה');return}
+    const nu=($('#nu')||{}).value||'';const o={type:'pct',v,label:$('#nl').value.trim().slice(0,60)||v+'% הנחה'};if(/^\d{4}-\d{2}-\d{2}$/.test(nu))o.until=nu;
+    try{await DB.collection('coupons').doc(c).set(o);COUPONS[c]=o;toast('הקופון נוסף');renderAdmin()}catch(x){toast('שגיאה בשמירת הקופון')}}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#adm').classList.contains('on'))closeAdmin();else closeAll();$('#a11yP').classList.remove('on')}});
+$('#scrim').addEventListener('click',closeAll);
+document.addEventListener('paste',e=>{
+  if(!$('#adm').classList.contains('on'))return;
+  const target=$('#imDrop')?'im':$('#mmDrop')?'mm':null;if(!target)return;
+  const cd=e.clipboardData;if(!cd)return;
+  let files=Array.from(cd.files||[]);
+  if(!files.length&&cd.items)files=Array.from(cd.items).filter(it=>it.kind==='file').map(it=>it.getAsFile()).filter(Boolean);
+  if(!files.length){
+    const html=cd.getData&&cd.getData('text/html');
+    if(html&&/<img/i.test(html)&&!(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName))){e.preventDefault();toast('הודבק קישור לתמונה ולא התמונה עצמה. לחצו על התמונה לחיצה ימנית ← "העתקת תמונה" ונסו שוב')}
+    return}
+  e.preventDefault();
+  const stamp=Date.now();
+  files=files.map((f,i)=>f.name&&f.name!=='image.png'?f:new File([f],'pasted-'+stamp+'-'+i+'.'+((f.type.split('/')[1]||'png').replace('jpeg','jpg')),{type:f.type}));
+  const z=$(target==='im'?'#imDrop':'#mmDrop');if(z){z.classList.add('over');setTimeout(()=>z.classList.remove('over'),500)}
+  if(target==='im'){addImFiles(files);toast(files.length===1?'התמונה הודבקה':files.length+' קבצים הודבקו')}else mmUpload(files);
+});
+['dragover','dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{
+  const z=e.target.closest&&e.target.closest('#imDrop,#mmDrop');if(!z)return;e.preventDefault();
+  if(ev==='dragover'){z.classList.add('over');return}
+  z.classList.remove('over');if(ev==='drop'&&e.dataTransfer){if(z.id==='imDrop')addImFiles(e.dataTransfer.files);else mmUpload(e.dataTransfer.files)}
+}));
+$('#sort').value='feat';
+
+/* header: rounded pill on scroll */
+const hdr=$('#hdr');let tick=false;
+function onScroll(){hdr.classList.toggle('scrolled',(window.scrollY||document.documentElement.scrollTop)>40);tick=false}
+window.addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
+
+/* accessibility */
+const A11Y=LS.get('lieto_a11y',{fs:1,on:[]});
+function applyA11y(){document.documentElement.style.setProperty('--fs',A11Y.fs);['a-contrast','a-light','a-gray','a-links','a-font','a-spacing','a-still','a-cursor','a-focus'].forEach(c=>document.body.classList.toggle(c,A11Y.on.includes(c)));$$('#a11yP [data-a^="a-"]').forEach(b=>b.setAttribute('aria-pressed',String(A11Y.on.includes(b.dataset.a))))}
+function a11y(a){
+  if(a==='fs+')A11Y.fs=Math.min(1.5,+(A11Y.fs+.1).toFixed(2));
+  else if(a==='fs-')A11Y.fs=Math.max(.9,+(A11Y.fs-.1).toFixed(2));
+  else if(a==='reset'){A11Y.fs=1;A11Y.on=[]}
+  else if(a==='doc'){openDoc('a11y');return}
+  else{const i=A11Y.on.indexOf(a);if(i<0){A11Y.on.push(a);if(a==='a-contrast')A11Y.on=A11Y.on.filter(x=>x!=='a-light');if(a==='a-light')A11Y.on=A11Y.on.filter(x=>x!=='a-contrast')}else A11Y.on.splice(i,1)}
+  LS.set('lieto_a11y',A11Y);applyA11y();
+}
+applyA11y();
+
+/* countdown to next Sunday 23:59 (store local time) */
+function tickCount(){const pr=heroPromo(),card=$('#promoCard');if(!card)return;
+  if(!pr||!pr.until){card.hidden=true;return}card.hidden=false;
+  $('#promoTxt').textContent=`${pr.v}% הנחה על כל ההזמנה בקוד:`;$('#promoCode').textContent=pr.code;$('#promoEnd').textContent=`המבצע מסתיים ב-${dmy(pr.until)} בחצות. קוד אחד להזמנה.`;
+  let sx=Math.max(0,Math.floor((untilTs(pr)-Date.now())/1000));const d=Math.floor(sx/86400);sx%=86400;const h=Math.floor(sx/3600);sx%=3600;const mi=Math.floor(sx/60);sx%=60;
+  $('#count').innerHTML=[[d,'ימים'],[h,'שעות'],[mi,'דקות'],[sx,'שניות']].map(([v,l])=>`<div><b>${String(v).padStart(2,'0')}</b><span>${l}</span></div>`).join('')}
+tickCount();setInterval(tickCount,1000);
+
+/* cart reminder + cookie */
+if(!LS.get('lieto_cookie',0))$('#cookie').classList.add('on');
+if(state.cart.length)setTimeout(()=>toast('נשארו לך פריטים בעגלה'),2500);
+
+/* ---------- boot ---------- */
+renderHero();renderAll();
+(async function(){
+  try{
+    const u=await claude.use('user');
+    if(u){USER=u;try{IS_ADMIN=!!(await u.canEdit())}catch(e){}try{MYID=await u.id()}catch(e){}}
+    DB=await claude.use('db');
+  }catch(e){}
+  if(IS_ADMIN)$('#btnAdmin').hidden=false;
+  if(!DB)return;
+  DBREADY=true;
+  try{
+    DB.collection('products').onSnapshot(s=>{s.docs.forEach(d=>{if(d.exists)OVR[d.id]=d.data()});renderAll()},()=>{});
+    DB.doc('settings/store').onSnapshot(d=>{if(d&&d.exists)applySettings(d.data())},()=>{});
+    DB.collection('coupons').onSnapshot(s=>{s.docs.forEach(d=>{if(d.exists){const x=d.data();if(x&&x.type)COUPONS[d.id]=x}});renderCart();renderHero();tickCount()},()=>{});
+    // retry orders that could not be saved earlier
+    if(MYID)for(const o of pending.splice(0)){try{await pushOrder(o)}catch(e){pending.push(o)}}
+    LS.set('lieto_pending_orders',pending);
+    if(IS_ADMIN){
+      const refresh=()=>{if($('#adm').classList.contains('on')&&!['aq'].includes((document.activeElement||{}).id)&&!/^(INPUT|SELECT)$/.test((document.activeElement||{}).tagName||''))renderAdmin()};
+      DB.collection('orders').onSnapshot(s=>{ORDERS=[];s.docs.forEach(d=>{const x=d.exists&&d.data();if(x&&Array.isArray(x.list))x.list.forEach(o=>{if(o&&o.customer&&Array.isArray(o.items))ORDERS.push(Object.assign({},o,{_owner:d.id}))})});refresh()},()=>{});
+      DB.collection('events').onSnapshot(s=>{EVENTS=[];s.docs.forEach(d=>{const x=d.exists&&d.data();if(x&&Array.isArray(x.list))EVENTS.push(...x.list)});refresh()},()=>{});
+      DB.collection('receipts').onSnapshot(s=>{RECEIPTS=s.docs.filter(d=>d.exists).map(d=>d.data()).filter(r=>r&&r.no);refresh()},()=>{});
+      DB.doc('private/drive').onSnapshot(d=>{if(d&&d.exists){const x=d.data();DRIVE={folderId:String(x.folderId||''),folderUrl:safeUrl(x.folderUrl||'')}}},()=>{});
+      DB.collection('subscribers').onSnapshot(s=>{SUBS=s.docs.filter(d=>d.exists).map(d=>d.data());refresh()},()=>{});
+    }
+  }catch(e){}
+})();
+})();
+</script>

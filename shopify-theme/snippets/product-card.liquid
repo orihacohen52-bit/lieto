@@ -1,0 +1,42 @@
+{%- liquid
+  assign img = product.featured_image
+  assign vid = blank
+  for m in product.media
+    if m.media_type == 'video'
+      assign vid = m
+      break
+    endif
+  endfor
+-%}
+<article class="card">
+  <a class="pic" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    {%- if img -%}
+      {{ img | image_url: width: 800 | image_tag: alt: product.title, loading: 'lazy', widths: '300, 500, 800', sizes: '(max-width: 760px) 50vw, 25vw' }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag }}
+    {%- endif -%}
+    {%- if vid != blank -%}
+      {%- assign src = vid.sources | where: 'format', 'mp4' | first -%}
+      {%- if src -%}<video data-src="{{ src.url }}" muted loop playsinline preload="none" aria-hidden="true"></video><span class="vbadge">▶ {{ 'products.video' | t }}</span>{%- endif -%}
+    {%- endif -%}
+    {%- if product.compare_at_price > product.price -%}
+      {%- assign off = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+      <span class="tag">{{ off }}%-</span>
+    {%- elsif product.tags contains 'חדש' or product.tags contains 'new' -%}
+      <span class="tag">{{ 'products.new' | t }}</span>
+    {%- endif -%}
+  </a>
+  <div class="cbody">
+    <h3><a href="{{ product.url }}">{{ product.title | escape }}</a></h3>
+    <div class="price"><b>{%- if product.price_varies -%}{%- assign pmin = product.price_min | money -%}{{ 'products.from' | t: price: pmin }}{%- else -%}{{ product.price | money }}{%- endif -%}</b>{%- if product.compare_at_price > product.price -%}<s>{{ product.compare_at_price | money }}</s>{%- endif -%}</div>
+    {%- if product.has_only_default_variant and product.available -%}
+      <form action="{{ routes.cart_add_url }}" method="post" data-ajax-cart>
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <button class="btn btn-ink" type="submit">{{ 'products.add' | t }}</button>
+      </form>
+    {%- else -%}
+      <a class="btn btn-ink" href="{{ product.url }}" style="margin-top:10px">{%- if product.available -%}{{ 'products.choose' | t }}{%- else -%}{{ 'products.sold_out' | t }}{%- endif -%}</a>
+    {%- endif -%}
+  </div>
+</article>

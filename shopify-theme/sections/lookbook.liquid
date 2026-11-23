@@ -1,0 +1,73 @@
+<section class="blk lookbook" id="lookbook" {{ section.shopify_attributes }}>
+  <div class="wrap">
+    <div class="sec-h"><div>
+      {%- if section.settings.eyebrow != blank -%}<div class="eyebrow">{{ section.settings.eyebrow | escape }}</div>{%- endif -%}
+      <h2>{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}<p>{{ section.settings.text | escape }}</p>{%- endif -%}
+    </div>
+    {%- if section.settings.link != blank -%}<a class="txtlink" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }}</a>{%- endif -%}
+    </div>
+    <div class="lb-grid">
+      {%- for block in section.blocks -%}
+        {%- capture inner -%}
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1000 | image_tag: alt: block.settings.caption, loading: 'lazy', widths: '400, 700, 1000', sizes: '(max-width: 760px) 50vw, 33vw' }}
+          {%- elsif block.settings.builtin != blank -%}
+            <img src="{{ block.settings.builtin | asset_url }}" alt="{{ block.settings.caption | escape }}" loading="lazy" width="620" height="830">
+          {%- endif -%}
+          {%- if block.settings.caption != blank -%}<span class="lb-cap">{{ block.settings.caption | escape }}</span>{%- endif -%}
+        {%- endcapture -%}
+        {%- if block.settings.url != blank -%}
+          <a class="lb-item{% if forloop.first %} lb-big{% endif %}" href="{{ block.settings.url }}" {{ block.shopify_attributes }}>{{ inner }}</a>
+        {%- else -%}
+          <div class="lb-item{% if forloop.first %} lb-big{% endif %}" {{ block.shopify_attributes }}>{{ inner }}</div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    {%- if section.settings.note != blank -%}<p class="lb-note">{{ section.settings.note | escape }}</p>{%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "לוקבוק",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "כותרת קטנה", "default": "השראה" },
+    { "type": "text", "id": "heading", "label": "כותרת", "default": "איך לוקים את זה" },
+    { "type": "textarea", "id": "text", "label": "טקסט", "default": "שרשרת אחת על טי-שירט, או שכבות לערב. כמה רעיונות לסטיילינג." },
+    { "type": "text", "id": "link_label", "label": "טקסט קישור", "default": "לכל הקולקציה" },
+    { "type": "url", "id": "link", "label": "קישור" },
+    { "type": "text", "id": "note", "label": "הערה קטנה מתחת לתמונות", "default": "התמונות להמחשת סטיילינג. הפריטים הנמכרים מופיעים בדף של כל מוצר.", "info": "מומלץ להשאיר כל עוד הדוגמנים לא עונדים בדיוק את המוצרים שבחנות" }
+  ],
+  "blocks": [
+    {
+      "type": "look",
+      "name": "תמונה",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "תמונה", "info": "אם ריק, מוצגת תמונה מובנית מהרשימה למטה" },
+        { "type": "select", "id": "builtin", "label": "תמונה מובנית", "default": "lb-1.jpg", "options": [
+          { "value": "lb-1.jpg", "label": "חולצה לבנה, שרשרת וצמיד" },
+          { "value": "lb-2.jpg", "label": "חולצה שחורה" },
+          { "value": "lb-3.jpg", "label": "ערב אורבני" },
+          { "value": "lb-4.jpg", "label": "פולו ירוק" },
+          { "value": "lb-5.jpg", "label": "חולצה בז׳" },
+          { "value": "lb-6.jpg", "label": "שקיעה בחוף" } ] },
+        { "type": "text", "id": "caption", "label": "כיתוב", "default": "לבן ונקי" },
+        { "type": "url", "id": "url", "label": "קישור (לא חובה)" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "לוקבוק",
+    "blocks": [
+      { "type": "look", "settings": { "builtin": "lb-1.jpg", "caption": "לבן ונקי" } },
+      { "type": "look", "settings": { "builtin": "lb-2.jpg", "caption": "קז׳ואל שחור" } },
+      { "type": "look", "settings": { "builtin": "lb-3.jpg", "caption": "ערב אורבני" } },
+      { "type": "look", "settings": { "builtin": "lb-4.jpg", "caption": "ים-תיכוני" } },
+      { "type": "look", "settings": { "builtin": "lb-5.jpg", "caption": "גוונים חמים" } },
+      { "type": "look", "settings": { "builtin": "lb-6.jpg", "caption": "שקיעה בחוף" } }
+    ]
+  }]
+}
+{% endschema %}

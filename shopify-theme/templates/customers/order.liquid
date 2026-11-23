@@ -1,0 +1,10 @@
+<div class="wrap page" style="padding-top:110px">
+  <h1>{{ 'customer.order' | t }} {{ order.name }}</h1>
+  <p>{{ order.created_at | date: '%d.%m.%Y' }} · {{ order.financial_status_label }} · {{ order.fulfillment_status_label }}</p>
+  {%- for item in order.line_items -%}
+    <div class="sum" style="border-bottom:1px solid var(--line);padding:10px 0"><span>{{ item.title | escape }} ×{{ item.quantity }}</span><span>{{ item.final_line_price | money }}</span></div>
+    {%- if item.fulfillment -%}<p style="font-size:.88rem">{{ 'customer.tracking' | t }}: {% if item.fulfillment.tracking_url %}<a href="{{ item.fulfillment.tracking_url }}">{{ item.fulfillment.tracking_number }}</a>{% else %}{{ item.fulfillment.tracking_number }}{% endif %}</p>{%- endif -%}
+  {%- endfor -%}
+  <div class="sum tot" style="margin-top:12px"><span>{{ 'cart.subtotal' | t }}</span><span>{{ order.total_price | money }}</span></div>
+  <p><a href="{{ routes.account_url }}">{{ 'customer.account' | t }}</a></p>
+</div>

@@ -1,0 +1,53 @@
+{%- liquid
+  assign goal = settings.free_ship_from | times: 100
+  assign left = goal | minus: cart.total_price
+  if goal > 0
+    assign pct = cart.total_price | times: 100 | divided_by: goal | at_most: 100
+  else
+    assign pct = 100
+  endif
+-%}
+<div class="wrap" style="padding-top:90px">
+  <h1 style="font-size:2.2rem;margin-top:20px">{{ 'cart.title' | t }}</h1>
+  {%- if cart.item_count == 0 -%}
+    <div class="empty" style="margin-block:30px 60px">{{ 'cart.empty' | t }} <a class="txtlink" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue' | t }}</a></div>
+  {%- else -%}
+  <form action="{{ routes.cart_url }}" method="post" class="cart-grid" id="cart">
+    <div>
+      {%- for item in cart.items -%}
+        <div class="line">
+          <a class="th" href="{{ item.url }}">{%- if item.image -%}{{ item.image | image_url: width: 200 | image_tag: alt: item.product.title, loading: 'lazy' }}{%- endif -%}</a>
+          <div>
+            <a href="{{ item.url }}" style="text-decoration:none"><b>{{ item.product.title | escape }}</b></a>
+            {%- unless item.product.has_only_default_variant -%}<div style="font-size:.85rem;color:var(--muted)">{{ item.variant.title | escape }}</div>{%- endunless -%}
+            {%- for d in item.line_level_discount_allocations -%}<div style="font-size:.82rem;color:var(--ok)">{{ d.discount_application.title | escape }} (−{{ d.amount | money }})</div>{%- endfor -%}
+            <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
+              <div class="qty"><button type="button" data-qty="-1" aria-label="{{ 'cart.less' | t }}">−</button><input type="number" name="updates[]" value="{{ item.quantity }}" min="0" max="99" data-line-qty="{{ forloop.index }}" aria-label="{{ 'cart.quantity' | t }}"><button type="button" data-qty="1" aria-label="{{ 'cart.more' | t }}">+</button></div>
+              <a href="{{ item.url_to_remove }}" style="font-size:.85rem;color:var(--muted)">{{ 'cart.remove' | t }}</a>
+            </div>
+          </div>
+          <b style="font-variant-numeric:tabular-nums">{{ item.final_line_price | money }}</b>
+        </div>
+      {%- endfor -%}
+    </div>
+    <aside class="summary">
+      {%- if goal > 0 -%}
+        <div class="ship-bar">
+          {%- if left > 0 -%}{%- assign left_m = left | money -%}{{ 'cart.ship_left' | t: amount: left_m }}{%- else -%}<b>{{ 'cart.ship_free' | t }}</b>{%- endif -%}
+          <div class="meter"><i style="width:{{ pct }}%"></i></div>
+        </div>
+      {%- endif -%}
+      {%- for d in cart.cart_level_discount_applications -%}<div class="sum" style="color:var(--ok)"><span>{{ d.title | escape }}</span><span>−{{ d.total_allocated_amount | money }}</span></div>{%- endfor -%}
+      <div class="sum tot"><span>{{ 'cart.subtotal' | t }}</span><span>{{ cart.total_price | money }}</span></div>
+      <p style="margin:0;font-size:.85rem;color:var(--muted)">{{ 'cart.at_checkout' | t }}</p>
+      <label class="sr" for="cart-note">{{ 'cart.note' | t }}</label>
+      <textarea class="field" id="cart-note" name="note" rows="2" placeholder="{{ 'cart.note' | t }}">{{ cart.note }}</textarea>
+      <button class="btn btn-ink" type="submit" name="checkout">{{ 'cart.checkout' | t }}</button>
+    </aside>
+  </form>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{ "name": "עגלה", "settings": [] }
+{% endschema %}

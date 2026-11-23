@@ -1,0 +1,40 @@
+<section class="blk story" id="how" {{ section.shopify_attributes }}>
+  <div class="wrap story-grid">
+    <div>
+      {%- if section.settings.eyebrow != blank -%}<div class="eyebrow">{{ section.settings.eyebrow | escape }}</div>{%- endif -%}
+      <h2 style="margin-block:12px 16px">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}<p>{{ section.settings.text | escape }}</p>{%- endif -%}
+    </div>
+    <div class="steps">
+      {%- for block in section.blocks -%}
+        <div class="step" {{ block.shopify_attributes }}><i>{{ forloop.index }}</i><div><b>{{ block.settings.title | escape }}</b><span>{{ block.settings.text | escape }}</span></div></div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "איך זה עובד",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "כותרת קטנה", "default": "איך זה עובד" },
+    { "type": "text", "id": "heading", "label": "כותרת", "default": "מהקליק ועד הלוק" },
+    { "type": "textarea", "id": "text", "label": "טקסט", "default": "כל הזמנה נארזת בקפידה ונשלחת עם מספר מעקב מלא, כך שאתה יודע בכל רגע איפה החבילה. זמן אספקה: 10 עד 25 ימי עסקים." }
+  ],
+  "blocks": [
+    { "type": "step", "name": "שלב", "settings": [
+      { "type": "text", "id": "title", "label": "כותרת", "default": "בוחרים" },
+      { "type": "text", "id": "text", "label": "טקסט", "default": "מזמינים באתר ומקבלים אישור למייל." } ] }
+  ],
+  "presets": [{
+    "name": "איך זה עובד",
+    "blocks": [
+      { "type": "step", "settings": { "title": "בוחרים את הפריט", "text": "מזמינים באתר תוך דקה ומקבלים אישור למייל." } },
+      { "type": "step", "settings": { "title": "מטפלים בהזמנה", "text": "ההזמנה יוצאת לטיפול ואריזה תוך יום עסקים." } },
+      { "type": "step", "settings": { "title": "החבילה בדרך אליך", "text": "מספר מעקב נשלח למייל ברגע שהיא יוצאת." } },
+      { "type": "step", "settings": { "title": "לא יושב בול? מחזירים", "text": "14 יום להחזרה, לפי התקנון." } }
+    ]
+  }]
+}
+{% endschema %}

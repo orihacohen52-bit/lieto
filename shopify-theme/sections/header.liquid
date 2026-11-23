@@ -1,0 +1,103 @@
+{%- if section.blocks.size > 0 -%}
+<div class="ann" role="region" aria-label="{{ 'general.announcement' | t }}" aria-live="polite">
+  {%- for block in section.blocks -%}
+    <span data-ann {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+  {%- endfor -%}
+</div>
+{%- endif -%}
+{%- assign menu = linklists[section.settings.menu] -%}
+<div class="hdr-slot">
+  <header class="hdr" id="hdr" {{ section.shopify_attributes }}>
+    <div class="hdr-in">
+      <div class="hdr-start">
+        <button class="ibtn burger" type="button" data-mnav="open" aria-label="{{ 'general.menu_open' | t }}">{% render 'icon', name: 'menu' %}</button>
+        <nav class="nav" aria-label="{{ 'general.main_nav' | t }}">
+          {%- for link in menu.links -%}
+            <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+          {%- endfor -%}
+        </nav>
+      </div>
+      <a class="logo" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+        {%- if section.settings.logo != blank -%}
+          {{ section.settings.logo | image_url: width: 400 | image_tag: alt: shop.name, loading: 'eager', widths: '200, 400' }}
+        {%- else -%}
+          {{ shop.name | upcase }}
+        {%- endif -%}
+      </a>
+      <div class="hdr-end">
+        <a class="ibtn" href="{{ routes.search_url }}" aria-label="{{ 'general.search' | t }}">{% render 'icon', name: 'search' %}</a>
+        {%- if shop.customer_accounts_enabled -%}
+          <a class="ibtn" href="{{ routes.account_url }}" aria-label="{{ 'general.account' | t }}">{% render 'icon', name: 'user' %}</a>
+        {%- endif -%}
+        <a class="ibtn" href="{{ routes.cart_url }}" aria-label="{{ 'general.cart' | t }}">
+          {% render 'icon', name: 'bag' %}
+          <span class="badge" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+        </a>
+      </div>
+    </div>
+  </header>
+</div>
+<div class="mnav" id="mnav">
+  <button class="close" type="button" data-mnav="close" aria-label="{{ 'general.menu_close' | t }}">✕</button>
+  {%- for link in menu.links -%}<a href="{{ link.url }}">{{ link.title }}</a>{%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "כותרת עליונה",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "את ההודעות בפס השחור העליון מוסיפים ועורכים כאן, כבלוקים."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "לוגו (לא חובה, אחרת יוצג שם החנות)"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "תפריט",
+      "default": "main-menu"
+    }
+  ],
+  "max_blocks": 5,
+  "blocks": [
+    {
+      "type": "message",
+      "name": "הודעה בפס העליון",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "טקסט",
+          "default": "תכשיטי גברים · משלוח חינם בהזמנה מעל <b>₪199</b>"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "message",
+        "settings": {
+          "text": "תכשיטי גברים · משלוח חינם בהזמנה מעל <b>₪199</b>"
+        }
+      },
+      {
+        "type": "message",
+        "settings": {
+          "text": "10% הנחה בהזמנה הראשונה עם הקוד <b>LIETO10</b>"
+        }
+      },
+      {
+        "type": "message",
+        "settings": {
+          "text": "מבצע השקה לגברים: 15% הנחה עם הקוד <b>LAUNCH15</b>"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

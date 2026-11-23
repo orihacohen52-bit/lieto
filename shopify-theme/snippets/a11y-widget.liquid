@@ -1,0 +1,17 @@
+<button class="a11y-btn" id="a11yBtn" type="button" aria-label="{{ 'a11y.open' | t }}" aria-expanded="false" aria-controls="a11yP">{% render 'icon', name: 'a11y' %}</button>
+<div class="a11y" id="a11yP" role="dialog" aria-label="{{ 'a11y.title' | t }}" hidden>
+  <h2>{{ 'a11y.title' | t }}</h2>
+  <div class="a11y-g">
+    <button type="button" data-a="fs+">{{ 'a11y.bigger' | t }}</button>
+    <button type="button" data-a="fs-">{{ 'a11y.smaller' | t }}</button>
+    <button type="button" data-a="a-contrast" aria-pressed="false">{{ 'a11y.contrast' | t }}</button>
+    <button type="button" data-a="a-gray" aria-pressed="false">{{ 'a11y.gray' | t }}</button>
+    <button type="button" data-a="a-links" aria-pressed="false">{{ 'a11y.links' | t }}</button>
+    <button type="button" data-a="a-font" aria-pressed="false">{{ 'a11y.font' | t }}</button>
+    <button type="button" data-a="a-spacing" aria-pressed="false">{{ 'a11y.spacing' | t }}</button>
+    <button type="button" data-a="a-still" aria-pressed="false">{{ 'a11y.still' | t }}</button>
+    <button type="button" data-a="a-focus" aria-pressed="false">{{ 'a11y.focus' | t }}</button>
+    {%- if settings.a11y_page != blank -%}<a href="{{ settings.a11y_page.url }}">{{ 'a11y.statement' | t }}</a>{%- endif -%}
+  </div>
+  <button class="reset" type="button" data-a="reset">{{ 'a11y.reset' | t }}</button>
+</div>
